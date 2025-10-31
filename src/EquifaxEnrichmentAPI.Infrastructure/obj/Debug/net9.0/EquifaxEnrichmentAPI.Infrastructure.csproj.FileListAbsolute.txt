@@ -16,3 +16,5 @@
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Infrastructure/obj/Debug/net9.0/refint/EquifaxEnrichmentAPI.Infrastructure.dll
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Infrastructure/obj/Debug/net9.0/EquifaxEnrichmentAPI.Infrastructure.pdb
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Infrastructure/obj/Debug/net9.0/ref/EquifaxEnrichmentAPI.Infrastructure.dll
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Infrastructure/bin/Debug/net9.0/EquifaxEnrichmentAPI.Infrastructure.runtimeconfig.json
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Infrastructure/obj/Debug/net9.0/EquifaxEnrichmentAPI.Infrastructure.genruntimeconfig.cache
