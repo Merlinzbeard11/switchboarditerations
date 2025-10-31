@@ -102,3 +102,9 @@
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/obj/Debug/net9.0/EquifaxEnrichmentAPI.Tests.Unit.pdb
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/obj/Debug/net9.0/EquifaxEnrichmentAPI.Tests.Unit.genruntimeconfig.cache
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/obj/Debug/net9.0/ref/EquifaxEnrichmentAPI.Tests.Unit.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/Castle.Core.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/FluentAssertions.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/Moq.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/System.Diagnostics.EventLog.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/runtimes/win/lib/net6.0/System.Diagnostics.EventLog.Messages.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/runtimes/win/lib/net6.0/System.Diagnostics.EventLog.dll
