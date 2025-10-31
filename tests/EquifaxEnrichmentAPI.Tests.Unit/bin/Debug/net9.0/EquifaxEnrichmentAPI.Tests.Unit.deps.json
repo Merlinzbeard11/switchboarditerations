@@ -8,9 +8,11 @@
     ".NETCoreApp,Version=v9.0": {
       "EquifaxEnrichmentAPI.Tests.Unit/1.0.0": {
         "dependencies": {
+          "EquifaxEnrichmentAPI.Api": "1.0.0",
           "EquifaxEnrichmentAPI.Application": "1.0.0",
           "EquifaxEnrichmentAPI.Domain": "1.0.0",
           "FluentAssertions": "8.8.0",
+          "FluentValidation": "12.0.0",
           "Microsoft.NET.Test.Sdk": "17.12.0",
           "Moq": "4.20.72",
           "coverlet.collector": "6.0.2",
@@ -41,6 +43,49 @@
           }
         }
       },
+      "FluentValidation/12.0.0": {
+        "runtime": {
+          "lib/net8.0/FluentValidation.dll": {
+            "assemblyVersion": "12.0.0.0",
+            "fileVersion": "12.0.0.0"
+          }
+        }
+      },
+      "FluentValidation.AspNetCore/11.3.1": {
+        "dependencies": {
+          "FluentValidation": "12.0.0",
+          "FluentValidation.DependencyInjectionExtensions": "11.11.0"
+        },
+        "runtime": {
+          "lib/net6.0/FluentValidation.AspNetCore.dll": {
+            "assemblyVersion": "11.0.0.0",
+            "fileVersion": "11.3.1.0"
+          }
+        }
+      },
+      "FluentValidation.DependencyInjectionExtensions/11.11.0": {
+        "dependencies": {
+          "FluentValidation": "12.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "2.1.0"
+        },
+        "runtime": {
+          "lib/netstandard2.1/FluentValidation.DependencyInjectionExtensions.dll": {
+            "assemblyVersion": "11.0.0.0",
+            "fileVersion": "11.11.0.0"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.OpenApi/9.0.9": {
+        "dependencies": {
+          "Microsoft.OpenApi": "1.6.17"
+        },
+        "runtime": {
+          "lib/net9.0/Microsoft.AspNetCore.OpenApi.dll": {
+            "assemblyVersion": "9.0.9.0",
+            "fileVersion": "9.0.925.42003"
+          }
+        }
+      },
       "Microsoft.CodeCoverage/17.12.0": {
         "runtime": {
           "lib/netcoreapp3.1/Microsoft.VisualStudio.CodeCoverage.Shim.dll": {
@@ -49,10 +94,19 @@
           }
         }
       },
+      "Microsoft.Extensions.DependencyInjection.Abstractions/2.1.0": {},
       "Microsoft.NET.Test.Sdk/17.12.0": {
         "dependencies": {
           "Microsoft.CodeCoverage": "17.12.0",
           "Microsoft.TestPlatform.TestHost": "17.12.0"
+        }
+      },
+      "Microsoft.OpenApi/1.6.17": {
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.OpenApi.dll": {
+            "assemblyVersion": "1.6.17.0",
+            "fileVersion": "1.6.17.0"
+          }
         }
       },
       "Microsoft.TestPlatform.ObjectModel/17.12.0": {
@@ -320,28 +374,7 @@
           }
         }
       },
-      "System.Diagnostics.EventLog/6.0.0": {
-        "runtime": {
-          "lib/net6.0/System.Diagnostics.EventLog.dll": {
-            "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.21.52210"
-          }
-        },
-        "runtimeTargets": {
-          "runtimes/win/lib/net6.0/System.Diagnostics.EventLog.Messages.dll": {
-            "rid": "win",
-            "assetType": "runtime",
-            "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.21.52210"
-          },
-          "runtimes/win/lib/net6.0/System.Diagnostics.EventLog.dll": {
-            "rid": "win",
-            "assetType": "runtime",
-            "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.21.52210"
-          }
-        }
-      },
+      "System.Diagnostics.EventLog/6.0.0": {},
       "System.Reflection.Metadata/1.6.0": {},
       "xunit/2.9.2": {
         "dependencies": {
@@ -396,6 +429,21 @@
         }
       },
       "xunit.runner.visualstudio/2.8.2": {},
+      "EquifaxEnrichmentAPI.Api/1.0.0": {
+        "dependencies": {
+          "EquifaxEnrichmentAPI.Application": "1.0.0",
+          "EquifaxEnrichmentAPI.Domain": "1.0.0",
+          "EquifaxEnrichmentAPI.Infrastructure": "1.0.0",
+          "FluentValidation.AspNetCore": "11.3.1",
+          "Microsoft.AspNetCore.OpenApi": "9.0.9"
+        },
+        "runtime": {
+          "EquifaxEnrichmentAPI.Api.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "EquifaxEnrichmentAPI.Application/1.0.0": {
         "dependencies": {
           "EquifaxEnrichmentAPI.Domain": "1.0.0"
@@ -410,6 +458,18 @@
       "EquifaxEnrichmentAPI.Domain/1.0.0": {
         "runtime": {
           "EquifaxEnrichmentAPI.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "EquifaxEnrichmentAPI.Infrastructure/1.0.0": {
+        "dependencies": {
+          "EquifaxEnrichmentAPI.Application": "1.0.0",
+          "EquifaxEnrichmentAPI.Domain": "1.0.0"
+        },
+        "runtime": {
+          "EquifaxEnrichmentAPI.Infrastructure.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
@@ -444,6 +504,34 @@
       "path": "fluentassertions/8.8.0",
       "hashPath": "fluentassertions.8.8.0.nupkg.sha512"
     },
+    "FluentValidation/12.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-8NVLxtMUXynRHJIX3Hn1ACovaqZIJASufXIIFkD0EUbcd5PmMsL1xUD5h548gCezJ5BzlITaR9CAMrGe29aWpA==",
+      "path": "fluentvalidation/12.0.0",
+      "hashPath": "fluentvalidation.12.0.0.nupkg.sha512"
+    },
+    "FluentValidation.AspNetCore/11.3.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-FjkfrGGwC+25oH8QpX1ti3gxkFjDDtotkAQWyQz2CkwQwEfRKTANjhh77I79kY8dov2ydK1SY+e4jiOWsbbDdQ==",
+      "path": "fluentvalidation.aspnetcore/11.3.1",
+      "hashPath": "fluentvalidation.aspnetcore.11.3.1.nupkg.sha512"
+    },
+    "FluentValidation.DependencyInjectionExtensions/11.11.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-viTKWaMbL3yJYgGI0DiCeavNbE9UPMWFVK2XS9nYXGbm3NDMd0/L5ER4wBzmTtW3BYh3SrlSXm9RACiKZ6stlA==",
+      "path": "fluentvalidation.dependencyinjectionextensions/11.11.0",
+      "hashPath": "fluentvalidation.dependencyinjectionextensions.11.11.0.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.OpenApi/9.0.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-3Sina0gS/CTYt9XG6DUFPdXOmJui7e551U0kO2bIiDk3vZ2sctxxenN+cE1a5CrUpjIVZfZr32neWYYRO+Piaw==",
+      "path": "microsoft.aspnetcore.openapi/9.0.9",
+      "hashPath": "microsoft.aspnetcore.openapi.9.0.9.nupkg.sha512"
+    },
     "Microsoft.CodeCoverage/17.12.0": {
       "type": "package",
       "serviceable": true,
@@ -451,12 +539,26 @@
       "path": "microsoft.codecoverage/17.12.0",
       "hashPath": "microsoft.codecoverage.17.12.0.nupkg.sha512"
     },
+    "Microsoft.Extensions.DependencyInjection.Abstractions/2.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-8/CtASu80UIoyG+r8FstrmZW5GLtXxzoYpjj3jV0FKZCL5CiFgSH3pAmqut/dC68mu7N1bU6v0UtKKL3gCUQGQ==",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/2.1.0",
+      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.2.1.0.nupkg.sha512"
+    },
     "Microsoft.NET.Test.Sdk/17.12.0": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-kt/PKBZ91rFCWxVIJZSgVLk+YR+4KxTuHf799ho8WNiK5ZQpJNAEZCAWX86vcKrs+DiYjiibpYKdGZP6+/N17w==",
       "path": "microsoft.net.test.sdk/17.12.0",
       "hashPath": "microsoft.net.test.sdk.17.12.0.nupkg.sha512"
+    },
+    "Microsoft.OpenApi/1.6.17": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Le+kehlmrlQfuDFUt1zZ2dVwrhFQtKREdKBo+rexOwaCoYP0/qpgT9tLxCsZjsgR5Itk1UKPcbgO+FyaNid/bA==",
+      "path": "microsoft.openapi/1.6.17",
+      "hashPath": "microsoft.openapi.1.6.17.nupkg.sha512"
     },
     "Microsoft.TestPlatform.ObjectModel/17.12.0": {
       "type": "package",
@@ -556,12 +658,22 @@
       "path": "xunit.runner.visualstudio/2.8.2",
       "hashPath": "xunit.runner.visualstudio.2.8.2.nupkg.sha512"
     },
+    "EquifaxEnrichmentAPI.Api/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
     "EquifaxEnrichmentAPI.Application/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
     "EquifaxEnrichmentAPI.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "EquifaxEnrichmentAPI.Infrastructure/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

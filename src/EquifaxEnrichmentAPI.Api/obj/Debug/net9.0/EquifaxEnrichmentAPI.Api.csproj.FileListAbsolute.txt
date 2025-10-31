@@ -37,3 +37,6 @@
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/obj/Debug/net9.0/EquifaxEnrichmentAPI.Api.pdb
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/obj/Debug/net9.0/EquifaxEnrichmentAPI.Api.genruntimeconfig.cache
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/obj/Debug/net9.0/ref/EquifaxEnrichmentAPI.Api.dll
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/bin/Debug/net9.0/FluentValidation.dll
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/bin/Debug/net9.0/FluentValidation.AspNetCore.dll
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/bin/Debug/net9.0/FluentValidation.DependencyInjectionExtensions.dll

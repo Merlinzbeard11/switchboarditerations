@@ -114,3 +114,6 @@
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/obj/Debug/net9.0/EquifaxEnrichmentAPI.Tests.Integration.pdb
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/obj/Debug/net9.0/EquifaxEnrichmentAPI.Tests.Integration.genruntimeconfig.cache
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/obj/Debug/net9.0/ref/EquifaxEnrichmentAPI.Tests.Integration.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/FluentValidation.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/FluentValidation.AspNetCore.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/FluentValidation.DependencyInjectionExtensions.dll

@@ -1,10 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "8EeHGw1Il9I=",
+  "dgSpecHash": "BmAW2nfgrpE=",
   "success": true,
   "projectFilePath": "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/EquifaxEnrichmentAPI.Api.csproj",
   "expectedPackageFiles": [
+    "/Users/merlinzbeard/.nuget/packages/fluentvalidation/11.11.0/fluentvalidation.11.11.0.nupkg.sha512",
+    "/Users/merlinzbeard/.nuget/packages/fluentvalidation.aspnetcore/11.3.1/fluentvalidation.aspnetcore.11.3.1.nupkg.sha512",
+    "/Users/merlinzbeard/.nuget/packages/fluentvalidation.dependencyinjectionextensions/11.11.0/fluentvalidation.dependencyinjectionextensions.11.11.0.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/microsoft.aspnetcore.openapi/9.0.9/microsoft.aspnetcore.openapi.9.0.9.nupkg.sha512",
+    "/Users/merlinzbeard/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/2.1.0/microsoft.extensions.dependencyinjection.abstractions.2.1.0.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512"
   ],
   "logs": []

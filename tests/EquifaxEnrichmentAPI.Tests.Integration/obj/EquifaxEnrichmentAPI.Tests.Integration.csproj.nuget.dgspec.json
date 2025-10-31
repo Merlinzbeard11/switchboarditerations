@@ -29,6 +29,9 @@
               "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Application/EquifaxEnrichmentAPI.Application.csproj": {
                 "projectPath": "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Application/EquifaxEnrichmentAPI.Application.csproj"
               },
+              "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Domain/EquifaxEnrichmentAPI.Domain.csproj": {
+                "projectPath": "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Domain/EquifaxEnrichmentAPI.Domain.csproj"
+              },
               "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Infrastructure/EquifaxEnrichmentAPI.Infrastructure.csproj": {
                 "projectPath": "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Infrastructure/EquifaxEnrichmentAPI.Infrastructure.csproj"
               }
@@ -51,6 +54,10 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "FluentValidation.AspNetCore": {
+              "target": "Package",
+              "version": "[11.3.1, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.9, )"
