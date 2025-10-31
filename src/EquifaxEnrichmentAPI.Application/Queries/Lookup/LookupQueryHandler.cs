@@ -1,5 +1,6 @@
 using MediatR;
 using EquifaxEnrichmentAPI.Domain.ValueObjects;
+using EquifaxEnrichmentAPI.Domain.Repositories;
 using System.Diagnostics;
 
 namespace EquifaxEnrichmentAPI.Application.Queries.Lookup;
@@ -16,11 +17,17 @@ namespace EquifaxEnrichmentAPI.Application.Queries.Lookup;
 /// - Scenario 10: Phone normalization handling
 /// - Scenario 12: Metadata requirements
 ///
-/// NOTE: This is Slice 3 implementation with MOCK responses.
-/// Future slices will add: database lookup, FCRA audit logging.
+/// Slice 4: Integrated with repository for actual database lookups.
 /// </summary>
 public class LookupQueryHandler : IRequestHandler<LookupQuery, LookupResult>
 {
+    private readonly IEnrichmentRepository _repository;
+
+    public LookupQueryHandler(IEnrichmentRepository repository)
+    {
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    }
+
     public async Task<LookupResult> Handle(LookupQuery request, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -42,69 +49,69 @@ public class LookupQueryHandler : IRequestHandler<LookupQuery, LookupResult>
         var normalizedPhone = phoneResult.Value.NormalizedValue;
 
         // ====================================================================
-        // MOCK DATA LOOKUP
-        // BDD Scenario 4: Simulate "no match" for phone 5559999999
-        // BDD Scenarios 1-3: Simulate successful match for other phones
+        // DATABASE LOOKUP
+        // BDD Scenario 4: No match found (returns null)
+        // BDD Scenarios 1-3: Successful match (returns entity)
         // ====================================================================
-        if (normalizedPhone == "5559999999")
+        var enrichment = await _repository.FindByPhoneAsync(normalizedPhone, cancellationToken);
+
+        if (enrichment == null)
         {
             return await HandleNoMatchFoundAsync(request, normalizedPhone, stopwatch, cancellationToken);
         }
 
         // ====================================================================
-        // SUCCESSFUL MATCH - MOCK RESPONSE
-        // BDD Scenarios 1-3: Return mock enrichment data
+        // SUCCESSFUL MATCH - MAP ENTITY TO RESULT
+        // BDD Scenarios 1-3: Return enrichment data from database
         // ====================================================================
-        return await HandleSuccessfulMatchAsync(request, normalizedPhone, stopwatch, cancellationToken);
+        return await MapEntityToResultAsync(enrichment, request, stopwatch, cancellationToken);
     }
 
     /// <summary>
-    /// Handles successful match scenario with mock data.
+    /// Maps database entity to application result.
     /// BDD Scenario 1: Basic fields response (~50 fields)
     /// BDD Scenario 2: Full fields response (398 fields)
-    /// BDD Scenario 3: Enhanced match confidence with optional fields
+    /// BDD Scenario 3: Enhances base match with optional fields from query
     /// </summary>
-    private async Task<LookupResult> HandleSuccessfulMatchAsync(
+    private async Task<LookupResult> MapEntityToResultAsync(
+        Domain.Entities.ConsumerEnrichment enrichment,
         LookupQuery request,
-        string normalizedPhone,
         Stopwatch stopwatch,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask; // Simulate async operation
+        await Task.CompletedTask; // Async signature for consistency
 
         // ====================================================================
-        // CALCULATE MATCH CONFIDENCE
-        // BDD Scenario 3: Higher confidence with optional fields (Lines 90-112)
+        // ENHANCE MATCH CONFIDENCE WITH OPTIONAL FIELDS
+        // BDD Scenario 3: Optional fields improve match confidence
+        // Base confidence from database + boost from optional fields
         // ====================================================================
-        var matchConfidence = CalculateMatchConfidence(request);
+        var enhancedConfidence = CalculateEnhancedConfidence(enrichment.MatchConfidence, request);
+        var enhancedMatchType = DetermineMatchType(request);
 
         // ====================================================================
-        // DETERMINE MATCH TYPE
-        // ====================================================================
-        var matchType = DetermineMatchType(request);
-
-        // ====================================================================
-        // BUILD RESPONSE
+        // MAP ENTITY TO RESULT
+        // Use data from database entity with enhanced match metadata
         // ====================================================================
         return new LookupResult
         {
             Response = "success",
-            Message = matchConfidence > 0.90
+            Message = enhancedConfidence > 0.90
                 ? "Record found with high confidence"
                 : "Record found with moderate confidence",
             Data = new EnrichmentData
             {
-                ConsumerKey = $"EQF_{Guid.NewGuid():N}",
-                PersonalInfo = new { /* TODO: Expand in future slice */ },
-                Addresses = new object[] { /* TODO: Expand in future slice */ },
-                Phones = new object[] { /* TODO: Expand in future slice */ },
-                Financial = new { /* TODO: Expand in future slice */ }
+                ConsumerKey = enrichment.ConsumerKey,
+                PersonalInfo = System.Text.Json.JsonSerializer.Deserialize<object>(enrichment.PersonalInfoJson),
+                Addresses = System.Text.Json.JsonSerializer.Deserialize<object[]>(enrichment.AddressesJson),
+                Phones = System.Text.Json.JsonSerializer.Deserialize<object[]>(enrichment.PhonesJson),
+                Financial = System.Text.Json.JsonSerializer.Deserialize<object>(enrichment.FinancialJson)
             },
             Metadata = new ResponseMetadata
             {
-                MatchConfidence = matchConfidence,
-                MatchType = matchType,
-                DataFreshnessDate = DateTime.UtcNow.AddDays(-7), // Mock: 7 days old
+                MatchConfidence = enhancedConfidence,
+                MatchType = enhancedMatchType,
+                DataFreshnessDate = enrichment.DataFreshnessDate,
                 QueryTimestamp = DateTime.UtcNow,
                 ResponseTimeMs = (int)stopwatch.ElapsedMilliseconds,
                 RequestId = Guid.NewGuid().ToString(),
@@ -112,6 +119,55 @@ public class LookupQueryHandler : IRequestHandler<LookupQuery, LookupResult>
                 TotalFieldsReturned = request.Fields?.ToLower() == "full" ? 398 : null
             }
         };
+    }
+
+    /// <summary>
+    /// Enhances base database confidence with optional field boost.
+    /// BDD Scenario 3: Optional fields improve match confidence (Lines 90-112)
+    /// </summary>
+    private static double CalculateEnhancedConfidence(double baseConfidence, LookupQuery request)
+    {
+        var confidence = baseConfidence;
+
+        // Name fields boost confidence
+        if (!string.IsNullOrWhiteSpace(request.FirstName))
+            confidence += 0.10;
+        if (!string.IsNullOrWhiteSpace(request.LastName))
+            confidence += 0.05;
+
+        // Address fields boost confidence
+        if (!string.IsNullOrWhiteSpace(request.PostalCode))
+            confidence += 0.07;
+        if (!string.IsNullOrWhiteSpace(request.State))
+            confidence += 0.03;
+
+        // IP address for fraud detection
+        if (!string.IsNullOrWhiteSpace(request.IpAddress))
+            confidence += 0.02;
+
+        // Cap at 1.0
+        return Math.Min(confidence, 1.0);
+    }
+
+    /// <summary>
+    /// Determines match type based on optional fields provided.
+    /// BDD Scenario 3: Match type indicates which fields were used (Lines 110-112)
+    /// </summary>
+    private static string DetermineMatchType(LookupQuery request)
+    {
+        var hasName = !string.IsNullOrWhiteSpace(request.FirstName) ||
+                      !string.IsNullOrWhiteSpace(request.LastName);
+        var hasAddress = !string.IsNullOrWhiteSpace(request.PostalCode) ||
+                         !string.IsNullOrWhiteSpace(request.State);
+
+        if (hasName && hasAddress)
+            return "phone_with_name_and_address";
+        if (hasName)
+            return "phone_with_name";
+        if (hasAddress)
+            return "phone_with_address";
+
+        return "phone_only";
     }
 
     /// <summary>
@@ -180,47 +236,5 @@ public class LookupQueryHandler : IRequestHandler<LookupQuery, LookupResult>
                 TotalFieldsReturned = null
             }
         };
-    }
-
-    /// <summary>
-    /// Calculates match confidence based on available fields.
-    /// BDD Scenario 3: > 0.90 with optional fields (Line 109)
-    /// </summary>
-    private static double CalculateMatchConfidence(LookupQuery request)
-    {
-        // Base confidence for phone-only match
-        var confidence = 0.75;
-
-        // Increase confidence with optional fields
-        if (!string.IsNullOrWhiteSpace(request.FirstName)) confidence += 0.05;
-        if (!string.IsNullOrWhiteSpace(request.LastName)) confidence += 0.05;
-        if (!string.IsNullOrWhiteSpace(request.PostalCode)) confidence += 0.05;
-        if (!string.IsNullOrWhiteSpace(request.State)) confidence += 0.03;
-        if (!string.IsNullOrWhiteSpace(request.IpAddress)) confidence += 0.02;
-
-        return Math.Min(confidence, 1.0); // Cap at 1.0
-    }
-
-    /// <summary>
-    /// Determines match type based on available fields.
-    /// </summary>
-    private static string DetermineMatchType(LookupQuery request)
-    {
-        var hasName = !string.IsNullOrWhiteSpace(request.FirstName) ||
-                     !string.IsNullOrWhiteSpace(request.LastName);
-
-        var hasAddress = !string.IsNullOrWhiteSpace(request.PostalCode) ||
-                        !string.IsNullOrWhiteSpace(request.State);
-
-        if (hasName && hasAddress)
-            return "phone_with_name_and_address";
-
-        if (hasName)
-            return "phone_with_name";
-
-        if (hasAddress)
-            return "phone_with_address";
-
-        return "phone_only";
     }
 }

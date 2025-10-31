@@ -1,6 +1,10 @@
 using Xunit;
 using FluentAssertions;
+using Moq;
 using EquifaxEnrichmentAPI.Application.Queries.Lookup;
+using EquifaxEnrichmentAPI.Domain.Repositories;
+using EquifaxEnrichmentAPI.Domain.Entities;
+using EquifaxEnrichmentAPI.Domain.ValueObjects;
 
 namespace EquifaxEnrichmentAPI.Tests.Unit.Application;
 
@@ -11,11 +15,40 @@ namespace EquifaxEnrichmentAPI.Tests.Unit.Application;
 /// </summary>
 public class LookupQueryHandlerTests
 {
+    private readonly Mock<IEnrichmentRepository> _repositoryMock;
     private readonly LookupQueryHandler _handler;
 
     public LookupQueryHandlerTests()
     {
-        _handler = new LookupQueryHandler();
+        _repositoryMock = new Mock<IEnrichmentRepository>();
+
+        // Setup mock repository responses
+        _repositoryMock
+            .Setup(r => r.FindByPhoneAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string normalizedPhone, CancellationToken ct) =>
+            {
+                // BDD Scenario 4: No match for specific phone
+                if (normalizedPhone == "5559999999")
+                    return null;
+
+                // Create mock entity with test data from database
+                // Using factory method to create valid entity
+                var phone = PhoneNumber.Create(normalizedPhone).Value;
+
+                return ConsumerEnrichment.Create(
+                    phone,
+                    $"EQF_{Guid.NewGuid():N}",
+                    0.75, // Base confidence for phone-only match
+                    "phone_only",
+                    DateTime.UtcNow.AddDays(-7), // Data from 7 days ago
+                    "{\"first_name\":\"Bob\",\"last_name\":\"Barker\"}",
+                    "[{\"street\":\"123 Main St\",\"city\":\"Bountiful\",\"state\":\"UT\",\"postal_code\":\"84010\"}]",
+                    "[{\"phone\":\"8015551234\",\"type\":\"mobile\"}]",
+                    "{\"credit_score\":720}"
+                );
+            });
+
+        _handler = new LookupQueryHandler(_repositoryMock.Object);
     }
 
     // ============================================================================
