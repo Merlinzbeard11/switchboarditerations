@@ -1,0 +1,209 @@
+{
+  "version": 3,
+  "targets": {
+    "net9.0": {
+      "Microsoft.AspNetCore.OpenApi/9.0.9": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.OpenApi": "1.6.17"
+        },
+        "compile": {
+          "lib/net9.0/Microsoft.AspNetCore.OpenApi.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/Microsoft.AspNetCore.OpenApi.dll": {
+            "related": ".xml"
+          }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
+      "Microsoft.OpenApi/1.6.17": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Microsoft.OpenApi.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.OpenApi.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
+      "EquifaxEnrichmentAPI.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "EquifaxEnrichmentAPI.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/EquifaxEnrichmentAPI.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/EquifaxEnrichmentAPI.Application.dll": {}
+        }
+      },
+      "EquifaxEnrichmentAPI.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/EquifaxEnrichmentAPI.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/EquifaxEnrichmentAPI.Domain.dll": {}
+        }
+      },
+      "EquifaxEnrichmentAPI.Infrastructure/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "EquifaxEnrichmentAPI.Application": "1.0.0",
+          "EquifaxEnrichmentAPI.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/EquifaxEnrichmentAPI.Infrastructure.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/EquifaxEnrichmentAPI.Infrastructure.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Microsoft.AspNetCore.OpenApi/9.0.9": {
+      "sha512": "3Sina0gS/CTYt9XG6DUFPdXOmJui7e551U0kO2bIiDk3vZ2sctxxenN+cE1a5CrUpjIVZfZr32neWYYRO+Piaw==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.openapi/9.0.9",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net9.0/Microsoft.AspNetCore.OpenApi.dll",
+        "lib/net9.0/Microsoft.AspNetCore.OpenApi.xml",
+        "microsoft.aspnetcore.openapi.9.0.9.nupkg.sha512",
+        "microsoft.aspnetcore.openapi.nuspec"
+      ]
+    },
+    "Microsoft.OpenApi/1.6.17": {
+      "sha512": "Le+kehlmrlQfuDFUt1zZ2dVwrhFQtKREdKBo+rexOwaCoYP0/qpgT9tLxCsZjsgR5Itk1UKPcbgO+FyaNid/bA==",
+      "type": "package",
+      "path": "microsoft.openapi/1.6.17",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/netstandard2.0/Microsoft.OpenApi.dll",
+        "lib/netstandard2.0/Microsoft.OpenApi.pdb",
+        "lib/netstandard2.0/Microsoft.OpenApi.xml",
+        "microsoft.openapi.1.6.17.nupkg.sha512",
+        "microsoft.openapi.nuspec"
+      ]
+    },
+    "EquifaxEnrichmentAPI.Application/1.0.0": {
+      "type": "project",
+      "path": "../EquifaxEnrichmentAPI.Application/EquifaxEnrichmentAPI.Application.csproj",
+      "msbuildProject": "../EquifaxEnrichmentAPI.Application/EquifaxEnrichmentAPI.Application.csproj"
+    },
+    "EquifaxEnrichmentAPI.Domain/1.0.0": {
+      "type": "project",
+      "path": "../EquifaxEnrichmentAPI.Domain/EquifaxEnrichmentAPI.Domain.csproj",
+      "msbuildProject": "../EquifaxEnrichmentAPI.Domain/EquifaxEnrichmentAPI.Domain.csproj"
+    },
+    "EquifaxEnrichmentAPI.Infrastructure/1.0.0": {
+      "type": "project",
+      "path": "../EquifaxEnrichmentAPI.Infrastructure/EquifaxEnrichmentAPI.Infrastructure.csproj",
+      "msbuildProject": "../EquifaxEnrichmentAPI.Infrastructure/EquifaxEnrichmentAPI.Infrastructure.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net9.0": [
+      "EquifaxEnrichmentAPI.Application >= 1.0.0",
+      "EquifaxEnrichmentAPI.Infrastructure >= 1.0.0",
+      "Microsoft.AspNetCore.OpenApi >= 9.0.9"
+    ]
+  },
+  "packageFolders": {
+    "/Users/merlinzbeard/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/EquifaxEnrichmentAPI.Api.csproj",
+      "projectName": "EquifaxEnrichmentAPI.Api",
+      "projectPath": "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/EquifaxEnrichmentAPI.Api.csproj",
+      "packagesPath": "/Users/merlinzbeard/.nuget/packages/",
+      "outputPath": "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/Users/merlinzbeard/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net9.0"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "projectReferences": {
+            "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Application/EquifaxEnrichmentAPI.Application.csproj": {
+              "projectPath": "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Application/EquifaxEnrichmentAPI.Application.csproj"
+            },
+            "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Infrastructure/EquifaxEnrichmentAPI.Infrastructure.csproj": {
+              "projectPath": "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Infrastructure/EquifaxEnrichmentAPI.Infrastructure.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.300"
+    },
+    "frameworks": {
+      "net9.0": {
+        "targetAlias": "net9.0",
+        "dependencies": {
+          "Microsoft.AspNetCore.OpenApi": {
+            "target": "Package",
+            "version": "[9.0.9, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.AspNetCore.App": {
+            "privateAssets": "none"
+          },
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.305/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
