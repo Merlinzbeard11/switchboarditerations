@@ -117,3 +117,9 @@
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/FluentValidation.dll
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/FluentValidation.AspNetCore.dll
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/FluentValidation.DependencyInjectionExtensions.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/MediatR.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/MediatR.Contracts.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/Microsoft.IdentityModel.Logging.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/Microsoft.IdentityModel.Tokens.dll

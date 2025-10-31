@@ -1,8 +1,11 @@
 using Xunit;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
+using MediatR;
 using EquifaxEnrichmentAPI.Api.Controllers;
 using EquifaxEnrichmentAPI.Api.DTOs;
+using EquifaxEnrichmentAPI.Application.Queries.Lookup;
 
 namespace EquifaxEnrichmentAPI.Tests.Unit.Api;
 
@@ -10,14 +13,102 @@ namespace EquifaxEnrichmentAPI.Tests.Unit.Api;
 /// Tests for Feature 1.1: REST API Endpoint - DataEnhancementController
 /// BDD Scenarios: features/phase1/feature-1.1-rest-api-endpoint.feature
 /// Scenarios 1-4: Basic endpoint functionality with mock responses
+///
+/// Slice 3: Updated to test thin controller with mocked MediatR.
+/// Business logic testing moved to LookupQueryHandlerTests.
 /// </summary>
 public class DataEnhancementControllerTests
 {
+    private readonly Mock<IMediator> _mediatorMock;
     private readonly DataEnhancementController _controller;
 
     public DataEnhancementControllerTests()
     {
-        _controller = new DataEnhancementController();
+        _mediatorMock = new Mock<IMediator>();
+
+        // Setup smart mock that dynamically responds based on query
+        // Simulates handler behavior to test controller mapping
+        _mediatorMock
+            .Setup(m => m.Send(It.IsAny<LookupQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((LookupQuery query, CancellationToken ct) =>
+            {
+                // Simulate "no match" for 5559999999 (same as handler)
+                if (query.Phone == "5559999999")
+                {
+                    return new LookupResult
+                    {
+                        Response = "error",
+                        Message = "Unable to find record for phone number",
+                        Data = new EnrichmentData
+                        {
+                            ConsumerKey = "5559999999",
+                            PersonalInfo = new { phone = "5559999999", match_attempted = true, match_confidence = 0.0 },
+                            Addresses = null,
+                            Phones = null,
+                            Financial = null
+                        },
+                        Metadata = new ResponseMetadata
+                        {
+                            MatchConfidence = 0.0,
+                            MatchType = "no_match",
+                            DataFreshnessDate = DateTime.UtcNow,
+                            QueryTimestamp = DateTime.UtcNow,
+                            ResponseTimeMs = 10,
+                            RequestId = Guid.NewGuid().ToString(),
+                            UniqueId = query.UniqueId,
+                            TotalFieldsReturned = null
+                        }
+                    };
+                }
+
+                // Calculate match confidence (same logic as handler)
+                var confidence = 0.75;
+                if (!string.IsNullOrWhiteSpace(query.FirstName)) confidence += 0.05;
+                if (!string.IsNullOrWhiteSpace(query.LastName)) confidence += 0.05;
+                if (!string.IsNullOrWhiteSpace(query.PostalCode)) confidence += 0.05;
+                if (!string.IsNullOrWhiteSpace(query.State)) confidence += 0.03;
+                if (!string.IsNullOrWhiteSpace(query.IpAddress)) confidence += 0.02;
+                confidence = Math.Min(confidence, 1.0);
+
+                // Determine match type (same logic as handler)
+                var hasName = !string.IsNullOrWhiteSpace(query.FirstName) || !string.IsNullOrWhiteSpace(query.LastName);
+                var hasAddress = !string.IsNullOrWhiteSpace(query.PostalCode) || !string.IsNullOrWhiteSpace(query.State);
+                var matchType = (hasName, hasAddress) switch
+                {
+                    (true, true) => "phone_with_name_and_address",
+                    (true, false) => "phone_with_name",
+                    (false, true) => "phone_with_address",
+                    _ => "phone_only"
+                };
+
+                // Success response
+                return new LookupResult
+                {
+                    Response = "success",
+                    Message = confidence > 0.90 ? "Record found with high confidence" : "Record found with moderate confidence",
+                    Data = new EnrichmentData
+                    {
+                        ConsumerKey = $"EQF_{Guid.NewGuid():N}",
+                        PersonalInfo = new { },
+                        Addresses = new object[] { },
+                        Phones = new object[] { },
+                        Financial = new { }
+                    },
+                    Metadata = new ResponseMetadata
+                    {
+                        MatchConfidence = confidence,
+                        MatchType = matchType,
+                        DataFreshnessDate = DateTime.UtcNow.AddDays(-7),
+                        QueryTimestamp = DateTime.UtcNow,
+                        ResponseTimeMs = 10,
+                        RequestId = Guid.NewGuid().ToString(),
+                        UniqueId = query.UniqueId,
+                        TotalFieldsReturned = query.Fields?.ToLower() == "full" ? 398 : null
+                    }
+                };
+            });
+
+        _controller = new DataEnhancementController(_mediatorMock.Object);
     }
 
     // ============================================================================

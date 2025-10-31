@@ -120,3 +120,9 @@
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/EquifaxEnrichmentAPI.Infrastructure.dll
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/EquifaxEnrichmentAPI.Api.pdb
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/EquifaxEnrichmentAPI.Infrastructure.pdb
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/MediatR.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/MediatR.Contracts.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/Microsoft.IdentityModel.Logging.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/bin/Debug/net9.0/Microsoft.IdentityModel.Tokens.dll
