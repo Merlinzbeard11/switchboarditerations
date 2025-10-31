@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EquifaxEnrichmentAPI.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+087898f5d8e750fb3bf8a67d6245896444bc5532")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2829a313cb3a9eb44d87d53ad8eea88c0d3789d3")]
 [assembly: System.Reflection.AssemblyProductAttribute("EquifaxEnrichmentAPI.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EquifaxEnrichmentAPI.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

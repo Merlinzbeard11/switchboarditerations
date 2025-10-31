@@ -1,37 +1,85 @@
+using Microsoft.EntityFrameworkCore;
+using EquifaxEnrichmentAPI.Infrastructure.Persistence;
+using EquifaxEnrichmentAPI.Domain.Repositories;
+using EquifaxEnrichmentAPI.Infrastructure.Repositories;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// ====================================================================
+// DATABASE CONFIGURATION
+// PostgreSQL 18 with Npgsql provider
+// ====================================================================
+builder.Services.AddDbContext<EnrichmentDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        npgsqlOptions => npgsqlOptions.MigrationsAssembly("EquifaxEnrichmentAPI.Infrastructure")
+    ));
+
+// ====================================================================
+// DEPENDENCY INJECTION
+// Repository Pattern following Clean Architecture
+// ====================================================================
+builder.Services.AddScoped<IEnrichmentRepository, EnrichmentRepository>();
+
+// ====================================================================
+// MEDIATR (CQRS)
+// Registers all handlers from Application assembly
+// ====================================================================
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(EquifaxEnrichmentAPI.Application.Queries.Lookup.LookupQuery).Assembly));
+
+// ====================================================================
+// FLUENT VALIDATION
+// Automatic validation on controller actions
+// Registers validators from API assembly (DTOs)
+// ====================================================================
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
+// ====================================================================
+// API CONTROLLERS
+// ====================================================================
+builder.Services.AddControllers();
+
+// ====================================================================
+// SWAGGER/OPENAPI DOCUMENTATION
+// Configured for development and production
+// ====================================================================
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Equifax Enrichment API",
+        Version = "v1",
+        Description = "Phone number enrichment API for consumer data lookup",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "API Support",
+            Email = "support@example.com"
+        }
+    });
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ====================================================================
+// HTTP REQUEST PIPELINE
+// ====================================================================
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Equifax Enrichment API v1");
+        c.RoutePrefix = string.Empty; // Swagger UI at root URL
+    });
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapControllers();
 
 app.Run();
 

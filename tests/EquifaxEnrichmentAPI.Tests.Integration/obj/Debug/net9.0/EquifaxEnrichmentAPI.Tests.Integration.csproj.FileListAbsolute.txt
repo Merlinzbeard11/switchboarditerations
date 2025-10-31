@@ -137,3 +137,6 @@
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/Microsoft.Extensions.Primitives.dll
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/Npgsql.dll
 /Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/Swashbuckle.AspNetCore.Swagger.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerGen.dll
+/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerUI.dll
