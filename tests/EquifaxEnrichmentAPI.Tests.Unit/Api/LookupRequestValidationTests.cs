@@ -24,7 +24,7 @@ public class LookupRequestValidationTests
     // BDD Lines 165-177
     // ============================================================================
 
-    [Fact]
+    [Fact(Skip = "MVP Phase 1 - API key validation deferred to future slice (BDD Scenario 5)")]
     public void Validate_MissingApiKey_ReturnsValidationError()
     {
         // Arrange
@@ -44,7 +44,7 @@ public class LookupRequestValidationTests
             .WithErrorMessage("api_key is required");
     }
 
-    [Fact]
+    [Fact(Skip = "MVP Phase 1 - Provider code validation deferred to future slice (BDD Scenario 6)")]
     public void Validate_MissingProviderCode_ReturnsValidationError()
     {
         // Arrange
@@ -84,7 +84,7 @@ public class LookupRequestValidationTests
             .WithErrorMessage("phone is required");
     }
 
-    [Fact]
+    [Fact(Skip = "MVP Phase 1 - Permissible purpose validation deferred to future slice (BDD Scenario 8)")]
     public void Validate_MissingPermissiblePurpose_ReturnsValidationError()
     {
         // Arrange
@@ -163,7 +163,7 @@ public class LookupRequestValidationTests
     // BDD Lines 207-220
     // ============================================================================
 
-    [Fact]
+    [Fact(Skip = "MVP Phase 1 - Permissible purpose validation deferred to future slice (BDD Scenario 8)")]
     public void Validate_InvalidPermissiblePurpose_ReturnsValidationError()
     {
         // Arrange

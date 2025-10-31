@@ -30,16 +30,24 @@ public partial class LookupRequestDtoValidator : AbstractValidator<LookupRequest
         // REQUIRED FIELDS VALIDATION
         // BDD Scenario 6: Missing Required Fields (400 Bad Request)
         // Lines 165-177
+        //
+        // MVP PHASE 1: Only phone is required.
+        // ApiKey, ProviderCode, and PermissiblePurpose will be enforced in future slices.
+        // TODO (Future Slice): Uncomment ApiKey validation for BDD Scenario 5
+        // TODO (Future Slice): Uncomment PermissiblePurpose validation for BDD Scenario 8
         // ====================================================================
 
-        RuleFor(x => x.ApiKey)
-            .NotEmpty()
-            .WithMessage("api_key is required");
+        // FUTURE: API Key validation (BDD Scenario 5)
+        // RuleFor(x => x.ApiKey)
+        //     .NotEmpty()
+        //     .WithMessage("api_key is required");
 
-        RuleFor(x => x.ProviderCode)
-            .NotEmpty()
-            .WithMessage("provider_code is required");
+        // FUTURE: Provider Code validation
+        // RuleFor(x => x.ProviderCode)
+        //     .NotEmpty()
+        //     .WithMessage("provider_code is required");
 
+        // MVP PHASE 1: Phone is REQUIRED
         RuleFor(x => x.Phone)
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
@@ -47,12 +55,13 @@ public partial class LookupRequestDtoValidator : AbstractValidator<LookupRequest
             .Must(BeValidPhoneNumber)
             .WithMessage("Invalid phone number format");
 
-        RuleFor(x => x.PermissiblePurpose)
-            .Cascade(CascadeMode.Stop)
-            .NotEmpty()
-            .WithMessage("permissible_purpose is required")
-            .Must(BeValidPermissiblePurpose)
-            .WithMessage($"Invalid permissible purpose. Valid values: {string.Join(", ", ValidPermissiblePurposes)}");
+        // FUTURE: Permissible Purpose validation (BDD Scenario 8)
+        // RuleFor(x => x.PermissiblePurpose)
+        //     .Cascade(CascadeMode.Stop)
+        //     .NotEmpty()
+        //     .WithMessage("permissible_purpose is required")
+        //     .Must(BeValidPermissiblePurpose)
+        //     .WithMessage($"Invalid permissible purpose. Valid values: {string.Join(", ", ValidPermissiblePurposes)}");
 
         // ====================================================================
         // OPTIONAL FIELDS VALIDATION

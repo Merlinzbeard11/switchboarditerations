@@ -34,7 +34,7 @@ public class LookupResponseDto
     /// Response metadata for tracking and monitoring
     /// BDD Scenario 12: Complete metadata requirements
     /// </summary>
-    [JsonPropertyName("_metadata")]
+    [JsonPropertyName("metadata")]
     public ResponseMetadataDto Metadata { get; set; } = new();
 }
 
