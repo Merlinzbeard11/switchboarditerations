@@ -41,6 +41,33 @@ builder.Services.AddDbContext<EnrichmentDbContext>(options =>
     ));
 
 // ====================================================================
+// REDIS CONFIGURATION (Rate Limiting & Caching)
+// CRITICAL GOTCHA: ConnectionMultiplexer MUST be singleton (13x faster)
+// Production: Uses AWS ElastiCache Redis endpoint
+// Development: Uses local Redis instance
+// ====================================================================
+builder.Services.AddSingleton<StackExchange.Redis.IConnectionMultiplexer>(sp =>
+{
+    var redisConnectionString = builder.Environment.IsProduction()
+        ? Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING") ?? "localhost:6379"
+        : "localhost:6379";
+
+    var configuration = StackExchange.Redis.ConfigurationOptions.Parse(redisConnectionString);
+    configuration.AbortOnConnectFail = false; // Graceful degradation if Redis unavailable
+    configuration.ConnectRetry = 3;
+    configuration.ConnectTimeout = 5000;
+
+    return StackExchange.Redis.ConnectionMultiplexer.Connect(configuration);
+});
+
+// ====================================================================
+// FCRA AUDIT LOGGING SERVICE
+// Background service using Channel<T> for fire-and-forget async logging
+// ====================================================================
+builder.Services.AddHostedService<EquifaxEnrichmentAPI.Api.Services.AuditLoggingService>();
+builder.Services.AddSingleton<EquifaxEnrichmentAPI.Api.Services.AuditLoggingService>();
+
+// ====================================================================
 // DEPENDENCY INJECTION
 // Repository Pattern following Clean Architecture
 // ====================================================================
@@ -316,6 +343,15 @@ app.MapGet("/docs/full-enrichment-example.json", () =>
     }
     return Results.NotFound();
 });
+
+// ====================================================================
+// RATE LIMITING MIDDLEWARE
+// BDD Feature: Rate Limiting (feature-2.2-rate-limiting.feature)
+// CRITICAL: Must be registered BEFORE authentication to protect against abuse
+// Uses Redis with Lua scripts for atomic operations (prevents race conditions)
+// Implements sliding window algorithm (prevents 2x burst at boundaries)
+// ====================================================================
+app.UseMiddleware<RateLimitingMiddleware>();
 
 // ====================================================================
 // API KEY AUTHENTICATION MIDDLEWARE
