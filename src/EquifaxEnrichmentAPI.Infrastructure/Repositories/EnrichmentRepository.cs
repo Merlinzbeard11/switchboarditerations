@@ -22,9 +22,17 @@ public class EnrichmentRepository : IEnrichmentRepository
     }
 
     /// <summary>
-    /// Finds enrichment data by normalized phone number.
-    /// BDD Scenario 1-3: Successful lookup
-    /// BDD Scenario 4: No match found (returns null)
+    /// Finds enrichment data by searching phone across multiple columns.
+    /// Feature 1.3: Multi-Phone Search Database Enhancement
+    /// BDD File: features/phase1/feature-1.3-database-query-multi-phone.feature
+    ///
+    /// Searches Phone1 through Phone10 columns using multi-column OR query.
+    /// PostgreSQL will use bitmap index scan to combine indexes efficiently.
+    ///
+    /// BDD Scenario 1: Phone1 match (100% confidence)
+    /// BDD Scenario 2: Phone2-Phone10 match (95%-55% confidence)
+    /// BDD Scenario 3: No match found (returns null)
+    /// BDD Scenario 4: Duplicate phone returns first match (highest confidence)
     /// </summary>
     public async Task<ConsumerEnrichment?> FindByPhoneAsync(
         string normalizedPhone,
@@ -33,10 +41,26 @@ public class EnrichmentRepository : IEnrichmentRepository
         if (string.IsNullOrWhiteSpace(normalizedPhone))
             throw new ArgumentException("Normalized phone cannot be empty", nameof(normalizedPhone));
 
-        // AsNoTracking for read-only queries (performance optimization)
+        // Multi-column OR query: Search Phone1 through Phone10 + legacy NormalizedPhone
+        // PostgreSQL bitmap index scan combines indexes for optimal performance
+        // AsNoTracking for read-only queries (N+1 gotcha mitigation)
+        //
+        // NOTE: NormalizedPhone included for backward compatibility during migration
+        // TODO (Slice 5): After populating Phone1-Phone10, remove NormalizedPhone from query
         return await _context.ConsumerEnrichments
             .AsNoTracking()
-            .FirstOrDefaultAsync(e => e.NormalizedPhone == normalizedPhone, cancellationToken);
+            .Where(e => e.NormalizedPhone == normalizedPhone  // Legacy - remove after migration
+                     || e.Phone1 == normalizedPhone
+                     || e.Phone2 == normalizedPhone
+                     || e.Phone3 == normalizedPhone
+                     || e.Phone4 == normalizedPhone
+                     || e.Phone5 == normalizedPhone
+                     || e.Phone6 == normalizedPhone
+                     || e.Phone7 == normalizedPhone
+                     || e.Phone8 == normalizedPhone
+                     || e.Phone9 == normalizedPhone
+                     || e.Phone10 == normalizedPhone)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     /// <summary>
