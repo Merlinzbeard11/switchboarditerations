@@ -68,8 +68,14 @@ public class EnrichmentRepositoryTests : IDisposable
         var result = await _repository.FindByPhoneAsync("8015551234");
 
         // Assert - Should find record when phone is in Phone1
+        // BDD Scenario 1: Phone1 match returns 100% confidence (Line 22)
         result.Should().NotBeNull();
-        result!.ConsumerKey.Should().Be("EQF_test_123");
+        result!.IsMatch.Should().BeTrue("phone found in Phone1 column");
+        result.Entity.Should().NotBeNull();
+        result.Entity!.ConsumerKey.Should().Be("EQF_test_123");
+        result.MatchedColumn.Should().Be(1, "phone was found in Phone1 column");
+        result.Confidence.Should().Be(1.00, "Phone1 match should be 100% confidence per BDD");
+        result.MatchedColumnName.Should().Be("Phone1");
     }
 
     [Fact]
@@ -95,8 +101,14 @@ public class EnrichmentRepositoryTests : IDisposable
         var result = await _repository.FindByPhoneAsync("8015551234");
 
         // Assert - Should find record when phone is in Phone2
+        // BDD Scenario 2: Phone2 match returns 95% confidence (Line 42)
         result.Should().NotBeNull("repository should search Phone2 column");
-        result!.ConsumerKey.Should().Be("EQF_test_456");
+        result!.IsMatch.Should().BeTrue("phone found in Phone2 column");
+        result.Entity.Should().NotBeNull();
+        result.Entity!.ConsumerKey.Should().Be("EQF_test_456");
+        result.MatchedColumn.Should().Be(2, "phone was found in Phone2 column");
+        result.Confidence.Should().Be(0.95, "Phone2 match should be 95% confidence per BDD");
+        result.MatchedColumnName.Should().Be("Phone2");
     }
 
     [Fact]
@@ -122,8 +134,14 @@ public class EnrichmentRepositoryTests : IDisposable
         var result = await _repository.FindByPhoneAsync("8015551234");
 
         // Assert - Should find record even in Phone10
+        // BDD Scenario 2: Phone10 match returns 55% confidence (Line 50)
         result.Should().NotBeNull("repository should search Phone10 column");
-        result!.ConsumerKey.Should().Be("EQF_test_789");
+        result!.IsMatch.Should().BeTrue("phone found in Phone10 column");
+        result.Entity.Should().NotBeNull();
+        result.Entity!.ConsumerKey.Should().Be("EQF_test_789");
+        result.MatchedColumn.Should().Be(10, "phone was found in Phone10 column");
+        result.Confidence.Should().Be(0.55, "Phone10 match should be 55% confidence per BDD");
+        result.MatchedColumnName.Should().Be("Phone10");
     }
 
     [Fact]
@@ -149,8 +167,14 @@ public class EnrichmentRepositoryTests : IDisposable
         // Act - Search for phone that doesn't exist in ANY column
         var result = await _repository.FindByPhoneAsync("8015551234");
 
-        // Assert - Should return null when no match in NormalizedPhone or Phone1-Phone10
-        result.Should().BeNull("phone 8015551234 is not in NormalizedPhone, Phone1, or any other column");
+        // Assert - Should return no match result when phone not in any column
+        // BDD Scenario 3: No match found returns null entity with 0.0 confidence (Line 60)
+        result.Should().NotBeNull("repository should return PhoneSearchResult even when no match");
+        result!.IsMatch.Should().BeFalse("phone 8015551234 is not in NormalizedPhone, Phone1, or any other column");
+        result.Entity.Should().BeNull();
+        result.Confidence.Should().Be(0.0, "no match should have 0% confidence per BDD");
+        result.MatchedColumn.Should().BeNull();
+        result.MatchedColumnName.Should().BeNull();
     }
 
     [Fact]
@@ -185,8 +209,14 @@ public class EnrichmentRepositoryTests : IDisposable
         var result = await _repository.FindByPhoneAsync("8015551234");
 
         // Assert - Should return first match (Phone1 has priority)
+        // BDD Scenario 4: Duplicate phone returns first match with highest confidence (Line 77)
         result.Should().NotBeNull();
-        result!.ConsumerKey.Should().Be("EQF_first",
+        result!.IsMatch.Should().BeTrue();
+        result.Entity.Should().NotBeNull();
+        result.Entity!.ConsumerKey.Should().Be("EQF_first",
             "Phone1 match should be returned first (highest confidence)");
+        result.MatchedColumn.Should().Be(1, "first match was in Phone1 column");
+        result.Confidence.Should().Be(1.00, "Phone1 match has 100% confidence");
+        result.MatchedColumnName.Should().Be("Phone1");
     }
 }

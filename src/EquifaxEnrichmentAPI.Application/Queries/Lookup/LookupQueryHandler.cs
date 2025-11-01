@@ -50,12 +50,13 @@ public class LookupQueryHandler : IRequestHandler<LookupQuery, LookupResult>
 
         // ====================================================================
         // DATABASE LOOKUP
-        // BDD Scenario 4: No match found (returns null)
-        // BDD Scenarios 1-3: Successful match (returns entity)
+        // Feature 1.3 Slice 4: Repository returns PhoneSearchResult with column-based confidence
+        // BDD Scenario 4: No match found (PhoneSearchResult.IsMatch = false)
+        // BDD Scenarios 1-3: Successful match (PhoneSearchResult.IsMatch = true)
         // ====================================================================
-        var enrichment = await _repository.FindByPhoneAsync(normalizedPhone, cancellationToken);
+        var searchResult = await _repository.FindByPhoneAsync(normalizedPhone, cancellationToken);
 
-        if (enrichment == null)
+        if (!searchResult.IsMatch)
         {
             return await HandleNoMatchFoundAsync(request, normalizedPhone, stopwatch, cancellationToken);
         }
@@ -63,35 +64,42 @@ public class LookupQueryHandler : IRequestHandler<LookupQuery, LookupResult>
         // ====================================================================
         // SUCCESSFUL MATCH - MAP ENTITY TO RESULT
         // BDD Scenarios 1-3: Return enrichment data from database
+        // Use column-based confidence from repository (no optional field boost needed)
         // ====================================================================
-        return await MapEntityToResultAsync(enrichment, request, stopwatch, cancellationToken);
+        return await MapEntityToResultAsync(searchResult, request, stopwatch, cancellationToken);
     }
 
     /// <summary>
-    /// Maps database entity to application result.
+    /// Maps database search result to application result.
+    /// Feature 1.3 Slice 4: Uses column-based confidence from PhoneSearchResult
     /// BDD Scenario 1: Basic fields response (~50 fields)
     /// BDD Scenario 2: Full fields response (398 fields)
     /// BDD Scenario 3: Enhances base match with optional fields from query
+    /// BDD Scenario 14: Confidence from matched column (Phone1=1.00, Phone2=0.95, etc.)
     /// </summary>
     private async Task<LookupResult> MapEntityToResultAsync(
-        Domain.Entities.ConsumerEnrichment enrichment,
+        Domain.ValueObjects.PhoneSearchResult searchResult,
         LookupQuery request,
         Stopwatch stopwatch,
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask; // Async signature for consistency
 
+        var enrichment = searchResult.Entity!; // Entity guaranteed non-null when IsMatch=true
+
         // ====================================================================
-        // ENHANCE MATCH CONFIDENCE WITH OPTIONAL FIELDS
-        // BDD Scenario 3: Optional fields improve match confidence
-        // Base confidence from database + boost from optional fields
+        // USE COLUMN-BASED CONFIDENCE FROM REPOSITORY
+        // Feature 1.3 Slice 4: Confidence calculated from matched column
+        // BDD Scenario 14: Phone1=1.00, Phone2=0.95, ..., Phone10=0.55
+        // Optional fields may still enhance confidence slightly
         // ====================================================================
-        var enhancedConfidence = CalculateEnhancedConfidence(enrichment.MatchConfidence, request);
+        var baseConfidence = searchResult.Confidence; // From matched column
+        var enhancedConfidence = CalculateEnhancedConfidence(baseConfidence, request);
         var enhancedMatchType = DetermineMatchType(request);
 
         // ====================================================================
         // MAP ENTITY TO RESULT
-        // Use data from database entity with enhanced match metadata
+        // Use data from database entity with column-based confidence
         // ====================================================================
         return new LookupResult
         {

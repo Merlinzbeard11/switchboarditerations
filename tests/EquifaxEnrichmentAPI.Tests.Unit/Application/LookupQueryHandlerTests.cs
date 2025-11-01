@@ -22,23 +22,23 @@ public class LookupQueryHandlerTests
     {
         _repositoryMock = new Mock<IEnrichmentRepository>();
 
-        // Setup mock repository responses
+        // Setup mock repository responses - Feature 1.3 Slice 4: Returns PhoneSearchResult
         _repositoryMock
             .Setup(r => r.FindByPhoneAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((string normalizedPhone, CancellationToken ct) =>
             {
                 // BDD Scenario 4: No match for specific phone
                 if (normalizedPhone == "5559999999")
-                    return null;
+                    return PhoneSearchResult.CreateNoMatch();
 
                 // Create mock entity with test data from database
                 // Using factory method to create valid entity
                 var phone = PhoneNumber.Create(normalizedPhone).Value;
 
-                return ConsumerEnrichment.Create(
+                var entity = ConsumerEnrichment.Create(
                     phone,
                     $"EQF_{Guid.NewGuid():N}",
-                    0.75, // Base confidence for phone-only match
+                    0.75, // Base confidence for phone-only match (ignored for new phone columns)
                     "phone_only",
                     DateTime.UtcNow.AddDays(-7), // Data from 7 days ago
                     "{\"first_name\":\"Bob\",\"last_name\":\"Barker\"}",
@@ -46,6 +46,9 @@ public class LookupQueryHandlerTests
                     "[{\"phone\":\"8015551234\",\"type\":\"mobile\"}]",
                     "{\"credit_score\":720}"
                 );
+
+                // Feature 1.3 Slice 4: Return PhoneSearchResult with Phone3 match (90% confidence)
+                return PhoneSearchResult.CreateMatch(entity, 3);
             });
 
         _handler = new LookupQueryHandler(_repositoryMock.Object);
@@ -235,7 +238,8 @@ public class LookupQueryHandlerTests
 
         // Assert
         result.Metadata.MatchType.Should().Be("phone_only");
-        result.Metadata.MatchConfidence.Should().Be(0.75); // Base confidence
+        // Feature 1.3 Slice 4: Confidence now based on matched column (mock returns Phone3 = 90%)
+        result.Metadata.MatchConfidence.Should().Be(0.90); // Phone3 column = 90% confidence
     }
 
     // ============================================================================

@@ -1,4 +1,5 @@
 using EquifaxEnrichmentAPI.Domain.Entities;
+using EquifaxEnrichmentAPI.Domain.ValueObjects;
 
 namespace EquifaxEnrichmentAPI.Domain.Repositories;
 
@@ -13,14 +14,16 @@ namespace EquifaxEnrichmentAPI.Domain.Repositories;
 public interface IEnrichmentRepository
 {
     /// <summary>
-    /// Finds enrichment data by normalized phone number.
-    /// BDD Scenario 1-3: Successful lookup
+    /// Finds enrichment data by normalized phone number with confidence scoring.
+    /// Feature 1.3 Slice 4: Returns matched column and calculated confidence.
+    /// BDD Scenario 1-3: Successful lookup with column-based confidence
     /// BDD Scenario 4: No match found
+    /// BDD Scenario 14: Confidence formula based on matched column
     /// </summary>
     /// <param name="normalizedPhone">Normalized 10-digit phone number</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Enrichment data if found, null otherwise</returns>
-    Task<ConsumerEnrichment?> FindByPhoneAsync(string normalizedPhone, CancellationToken cancellationToken = default);
+    /// <returns>PhoneSearchResult with matched entity, column index, and confidence</returns>
+    Task<PhoneSearchResult> FindByPhoneAsync(string normalizedPhone, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Adds new enrichment record.
