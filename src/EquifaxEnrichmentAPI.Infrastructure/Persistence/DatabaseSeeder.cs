@@ -32,12 +32,13 @@ public static class DatabaseSeeder
         // ====================================================================
         // BDD SCENARIO 1-3, 10: Successful lookup for phone 8015551234
         // High-quality consumer record for testing successful enrichment
+        // Feature 1.3 Slice 5: Populate Phone1 column for 100% confidence testing
         // ====================================================================
         var testPhone1 = PhoneNumber.Create("8015551234").Value;
         var consumer1 = ConsumerEnrichment.Create(
             testPhone1,
             "EQF_" + Guid.NewGuid().ToString("N").Substring(0, 24).ToUpper(), // 24-char key
-            0.75, // Base confidence (will be enhanced by optional fields in tests)
+            0.75, // Base confidence (ignored - will use Phone1 = 100% confidence)
             "phone_only",
             DateTime.UtcNow.AddDays(-7), // Data refreshed 7 days ago
             personalInfoJson: @"{
@@ -111,6 +112,9 @@ public static class DatabaseSeeder
             }"
         );
 
+        // Feature 1.3 Slice 5: Populate Phone1 using reflection (100% confidence)
+        SetPhoneColumn(consumer1, 1, "8015551234");
+
         await context.ConsumerEnrichments.AddAsync(consumer1);
 
         // ====================================================================
@@ -118,11 +122,12 @@ public static class DatabaseSeeder
         // ====================================================================
 
         // High confidence record with recent data
+        // Feature 1.3 Slice 5: Populate Phone2 for 95% confidence testing
         var testPhone2 = PhoneNumber.Create("3105552000").Value;
         var consumer2 = ConsumerEnrichment.Create(
             testPhone2,
             "EQF_" + Guid.NewGuid().ToString("N").Substring(0, 24).ToUpper(),
-            0.95, // High base confidence
+            0.95, // High base confidence (ignored - will use Phone2 = 95% confidence)
             "phone_with_name_and_address",
             DateTime.UtcNow.AddDays(-1), // Very fresh data
             personalInfoJson: @"{""first_name"": ""Alice"", ""last_name"": ""Smith"", ""age"": 42}",
@@ -131,14 +136,18 @@ public static class DatabaseSeeder
             financialJson: @"{""credit_score"": 800, ""estimated_income"": 120000}"
         );
 
+        // Feature 1.3 Slice 5: Populate Phone2 using reflection (95% confidence)
+        SetPhoneColumn(consumer2, 2, "3105552000");
+
         await context.ConsumerEnrichments.AddAsync(consumer2);
 
         // Lower confidence record with older data
+        // Feature 1.3 Slice 5: Populate Phone10 for 55% confidence testing (lowest)
         var testPhone3 = PhoneNumber.Create("2125553000").Value;
         var consumer3 = ConsumerEnrichment.Create(
             testPhone3,
             "EQF_" + Guid.NewGuid().ToString("N").Substring(0, 24).ToUpper(),
-            0.60, // Lower confidence
+            0.60, // Lower confidence (ignored - will use Phone10 = 55% confidence)
             "phone_only",
             DateTime.UtcNow.AddDays(-90), // Older data (3 months)
             personalInfoJson: @"{""first_name"": ""John"", ""last_name"": ""Doe""}",
@@ -147,15 +156,37 @@ public static class DatabaseSeeder
             financialJson: @"{""credit_score"": 650}"
         );
 
+        // Feature 1.3 Slice 5: Populate Phone10 using reflection (55% confidence - lowest)
+        SetPhoneColumn(consumer3, 10, "2125553000");
+
         await context.ConsumerEnrichments.AddAsync(consumer3);
 
         // Save all changes
         await context.SaveChangesAsync();
 
         Console.WriteLine($"✅ Seeded {3} test consumer enrichment records");
-        Console.WriteLine($"   - 8015551234: Bob Barker (base confidence 0.75)");
-        Console.WriteLine($"   - 3105552000: Alice Smith (high confidence 0.95)");
-        Console.WriteLine($"   - 2125553000: John Doe (low confidence 0.60)");
+        Console.WriteLine($"   - 8015551234: Bob Barker (Phone1 = 100% confidence)");
+        Console.WriteLine($"   - 3105552000: Alice Smith (Phone2 = 95% confidence)");
+        Console.WriteLine($"   - 2125553000: John Doe (Phone10 = 55% confidence)");
         Console.WriteLine($"   - 5559999999: NOT SEEDED (for no-match scenario testing)");
+        Console.WriteLine($"   Feature 1.3 Slice 5: Phone1-Phone10 columns populated for confidence testing");
+    }
+
+    /// <summary>
+    /// Helper method to set Phone1-Phone10 using reflection.
+    /// Feature 1.3 Slice 5: ConsumerEnrichment has private setters, so we use reflection.
+    /// </summary>
+    private static void SetPhoneColumn(ConsumerEnrichment entity, int columnIndex, string phoneValue)
+    {
+        if (columnIndex < 1 || columnIndex > 10)
+            throw new ArgumentOutOfRangeException(nameof(columnIndex), "Column index must be 1-10");
+
+        var propertyName = $"Phone{columnIndex}";
+        var property = typeof(ConsumerEnrichment).GetProperty(propertyName);
+
+        if (property == null)
+            throw new InvalidOperationException($"Property {propertyName} not found on ConsumerEnrichment");
+
+        property.SetValue(entity, phoneValue);
     }
 }

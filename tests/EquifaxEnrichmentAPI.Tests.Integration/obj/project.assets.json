@@ -213,6 +213,24 @@
       "Microsoft.EntityFrameworkCore.Analyzers/9.0.10": {
         "type": "package"
       },
+      "Microsoft.EntityFrameworkCore.InMemory/9.0.10": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "9.0.10",
+          "Microsoft.Extensions.Caching.Memory": "9.0.10",
+          "Microsoft.Extensions.Logging": "9.0.10"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.EntityFrameworkCore.Relational/9.0.1": {
         "type": "package",
         "dependencies": {
@@ -1882,6 +1900,21 @@
         "docs/PACKAGE.md",
         "microsoft.entityframeworkcore.analyzers.9.0.10.nupkg.sha512",
         "microsoft.entityframeworkcore.analyzers.nuspec"
+      ]
+    },
+    "Microsoft.EntityFrameworkCore.InMemory/9.0.10": {
+      "sha512": "fRnQ7qcHNINRoErantws9k3CdjcYwvbx+fLB3ZDN/EDC7kt93J3fPB15aEbnum2JiFPbw3fgr9iOGWyxaRXD9Q==",
+      "type": "package",
+      "path": "microsoft.entityframeworkcore.inmemory/9.0.10",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll",
+        "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.xml",
+        "microsoft.entityframeworkcore.inmemory.9.0.10.nupkg.sha512",
+        "microsoft.entityframeworkcore.inmemory.nuspec"
       ]
     },
     "Microsoft.EntityFrameworkCore.Relational/9.0.1": {
@@ -3731,6 +3764,7 @@
       "EquifaxEnrichmentAPI.Api >= 1.0.0",
       "FluentAssertions >= 8.8.0",
       "Microsoft.AspNetCore.Mvc.Testing >= 9.0.10",
+      "Microsoft.EntityFrameworkCore.InMemory >= 9.0.10",
       "Microsoft.NET.Test.Sdk >= 17.12.0",
       "coverlet.collector >= 6.0.2",
       "xunit >= 2.9.2",
@@ -3789,6 +3823,10 @@
             "version": "[8.8.0, )"
           },
           "Microsoft.AspNetCore.Mvc.Testing": {
+            "target": "Package",
+            "version": "[9.0.10, )"
+          },
+          "Microsoft.EntityFrameworkCore.InMemory": {
             "target": "Package",
             "version": "[9.0.10, )"
           },

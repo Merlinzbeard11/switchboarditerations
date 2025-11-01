@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "LlweptbqN/o=",
+  "dgSpecHash": "XwUiW173efk=",
   "success": true,
   "projectFilePath": "/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Integration/EquifaxEnrichmentAPI.Tests.Integration.csproj",
   "expectedPackageFiles": [
@@ -18,6 +18,7 @@
     "/Users/merlinzbeard/.nuget/packages/microsoft.entityframeworkcore/9.0.10/microsoft.entityframeworkcore.9.0.10.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/microsoft.entityframeworkcore.abstractions/9.0.10/microsoft.entityframeworkcore.abstractions.9.0.10.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/microsoft.entityframeworkcore.analyzers/9.0.10/microsoft.entityframeworkcore.analyzers.9.0.10.nupkg.sha512",
+    "/Users/merlinzbeard/.nuget/packages/microsoft.entityframeworkcore.inmemory/9.0.10/microsoft.entityframeworkcore.inmemory.9.0.10.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/microsoft.entityframeworkcore.relational/9.0.1/microsoft.entityframeworkcore.relational.9.0.1.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/microsoft.extensions.apidescription.server/9.0.0/microsoft.extensions.apidescription.server.9.0.0.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/microsoft.extensions.caching.abstractions/9.0.10/microsoft.extensions.caching.abstractions.9.0.10.nupkg.sha512",
