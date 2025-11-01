@@ -25,6 +25,11 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
     {
         _factory = factory;
         _client = factory.CreateClient();
+
+        // Add API key authentication header for all requests
+        // BDD Feature: API Key Authentication (feature-2.1-api-key-authentication.feature)
+        // All requests now require X-API-Key header
+        _client.DefaultRequestHeaders.Add("X-API-Key", "test-api-key-123");
     }
 
     // ====================================================================

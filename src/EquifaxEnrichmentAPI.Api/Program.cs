@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using EquifaxEnrichmentAPI.Infrastructure.Persistence;
 using EquifaxEnrichmentAPI.Domain.Repositories;
 using EquifaxEnrichmentAPI.Infrastructure.Repositories;
+using EquifaxEnrichmentAPI.Api.Middleware;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -79,6 +80,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// ====================================================================
+// API KEY AUTHENTICATION MIDDLEWARE
+// BDD Feature: API Key Authentication (feature-2.1-api-key-authentication.feature)
+// CRITICAL: Must be registered BEFORE MapControllers() to authenticate all requests
+// ====================================================================
+app.UseApiKeyAuthentication();
+
 app.MapControllers();
 
 app.Run();

@@ -22,27 +22,9 @@ public class LookupRequestValidationTests
     // ============================================================================
     // SCENARIO 6: Missing Required Fields (400 Bad Request)
     // BDD Lines 165-177
+    // NOTE: API key authentication is now handled by middleware (feature-2.1) using
+    // X-API-Key header - no api_key field in request body
     // ============================================================================
-
-    [Fact(Skip = "MVP Phase 1 - API key validation deferred to future slice (BDD Scenario 5)")]
-    public void Validate_MissingApiKey_ReturnsValidationError()
-    {
-        // Arrange
-        var request = new LookupRequestDto
-        {
-            ApiKey = null, // Missing required field
-            ProviderCode = "EQUIFAX_ENRICHMENT",
-            Phone = "8015551234",
-            PermissiblePurpose = "insurance_underwriting"
-        };
-
-        // Act
-        var result = _validator.TestValidate(request);
-
-        // Assert
-        result.ShouldHaveValidationErrorFor(x => x.ApiKey)
-            .WithErrorMessage("api_key is required");
-    }
 
     [Fact(Skip = "MVP Phase 1 - Provider code validation deferred to future slice (BDD Scenario 6)")]
     public void Validate_MissingProviderCode_ReturnsValidationError()
@@ -50,7 +32,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = null, // Missing required field
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting"
@@ -70,7 +51,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = null, // Missing required field
             PermissiblePurpose = "insurance_underwriting"
@@ -90,7 +70,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = null // Missing required field
@@ -120,7 +99,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = invalidPhone,
             PermissiblePurpose = "insurance_underwriting"
@@ -145,7 +123,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = validPhone,
             PermissiblePurpose = "insurance_underwriting"
@@ -169,7 +146,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "invalid_purpose"
@@ -194,7 +170,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = validPurpose
@@ -218,7 +193,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting"
@@ -241,7 +215,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting",
@@ -261,7 +234,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting",
@@ -287,7 +259,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting",
@@ -315,7 +286,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting",
@@ -338,7 +308,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting",
@@ -361,7 +330,6 @@ public class LookupRequestValidationTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting",

@@ -122,7 +122,6 @@ public class DataEnhancementControllerTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting",
@@ -150,7 +149,6 @@ public class DataEnhancementControllerTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting"
@@ -182,7 +180,6 @@ public class DataEnhancementControllerTests
         var uniqueId = "test-tracking-id-123";
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting",
@@ -211,7 +208,6 @@ public class DataEnhancementControllerTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting",
@@ -240,7 +236,6 @@ public class DataEnhancementControllerTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             FirstName = "Bob",
@@ -279,7 +274,6 @@ public class DataEnhancementControllerTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = phoneFormat,
             PermissiblePurpose = "insurance_underwriting"
@@ -310,7 +304,6 @@ public class DataEnhancementControllerTests
         // Arrange - Using a phone number that doesn't exist
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "5559999999", // Non-existent phone
             PermissiblePurpose = "insurance_underwriting"
@@ -346,7 +339,6 @@ public class DataEnhancementControllerTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting"
@@ -369,7 +361,6 @@ public class DataEnhancementControllerTests
         // Arrange
         var request = new LookupRequestDto
         {
-            ApiKey = "157659ac293445df00772760e6114ac4",
             ProviderCode = "EQUIFAX_ENRICHMENT",
             Phone = "8015551234",
             PermissiblePurpose = "insurance_underwriting"

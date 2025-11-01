@@ -10,13 +10,6 @@ namespace EquifaxEnrichmentAPI.Api.DTOs;
 public class LookupRequestDto
 {
     /// <summary>
-    /// API key for authentication (required)
-    /// BDD Scenario 5: Invalid API key validation
-    /// </summary>
-    [JsonPropertyName("api_key")]
-    public string? ApiKey { get; set; }
-
-    /// <summary>
     /// Provider code identifying the data source (required)
     /// Expected value: "EQUIFAX_ENRICHMENT"
     /// </summary>

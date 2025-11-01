@@ -32,15 +32,11 @@ public partial class LookupRequestDtoValidator : AbstractValidator<LookupRequest
         // Lines 165-177
         //
         // MVP PHASE 1: Only phone is required.
-        // ApiKey, ProviderCode, and PermissiblePurpose will be enforced in future slices.
-        // TODO (Future Slice): Uncomment ApiKey validation for BDD Scenario 5
+        // Authentication is now handled by API Key Authentication Middleware (feature-2.1)
+        // using X-API-Key header - no api_key field in request body.
+        // ProviderCode and PermissiblePurpose will be enforced in future slices.
         // TODO (Future Slice): Uncomment PermissiblePurpose validation for BDD Scenario 8
         // ====================================================================
-
-        // FUTURE: API Key validation (BDD Scenario 5)
-        // RuleFor(x => x.ApiKey)
-        //     .NotEmpty()
-        //     .WithMessage("api_key is required");
 
         // FUTURE: Provider Code validation
         // RuleFor(x => x.ProviderCode)

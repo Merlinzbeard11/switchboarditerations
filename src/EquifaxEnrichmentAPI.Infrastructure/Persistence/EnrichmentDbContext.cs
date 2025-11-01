@@ -22,6 +22,12 @@ public class EnrichmentDbContext : DbContext
     /// </summary>
     public DbSet<ConsumerEnrichment> ConsumerEnrichments => Set<ConsumerEnrichment>();
 
+    /// <summary>
+    /// Buyer accounts with API key authentication
+    /// BDD Feature: API Key Authentication (feature-2.1-api-key-authentication.feature)
+    /// </summary>
+    public DbSet<Buyer> Buyers => Set<Buyer>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
