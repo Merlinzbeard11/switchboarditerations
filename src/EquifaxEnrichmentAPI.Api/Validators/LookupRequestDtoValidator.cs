@@ -38,10 +38,10 @@ public partial class LookupRequestDtoValidator : AbstractValidator<LookupRequest
         // TODO (Future Slice): Uncomment PermissiblePurpose validation for BDD Scenario 8
         // ====================================================================
 
-        // FUTURE: Provider Code validation
-        // RuleFor(x => x.ProviderCode)
-        //     .NotEmpty()
-        //     .WithMessage("provider_code is required");
+        // Slice 9: Provider Code validation
+        RuleFor(x => x.ProviderCode)
+            .NotEmpty()
+            .WithMessage("provider_code is required");
 
         // MVP PHASE 1: Phone is REQUIRED
         RuleFor(x => x.Phone)

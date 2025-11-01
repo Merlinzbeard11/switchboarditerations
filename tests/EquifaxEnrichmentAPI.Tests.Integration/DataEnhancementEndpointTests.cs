@@ -44,6 +44,7 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         var request = new
         {
             phone = "8015551234",
+            provider_code = "TEST",
             fields = "basic"
         };
 
@@ -82,7 +83,8 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         // Arrange - Verify specific consumer data from seeded database
         var request = new
         {
-            phone = "8015551234"
+            phone = "8015551234",
+            provider_code = "TEST"
         };
 
         // Act
@@ -115,6 +117,7 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         var request = new
         {
             phone = "8015551234",
+            provider_code = "TEST",
             fields = "full"
         };
 
@@ -144,6 +147,7 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         var request = new
         {
             phone = "8015551234",
+            provider_code = "TEST",
             first_name = "Bob",
             last_name = "Barker",
             postal_code = "84010",
@@ -186,7 +190,8 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         // Phone 5559999999 is NOT seeded in database
         var request = new
         {
-            phone = "5559999999"
+            phone = "5559999999",
+            provider_code = "TEST"
         };
 
         // Act
@@ -230,7 +235,8 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         // Arrange - BDD Scenario 10 (Lines 246-269)
         var request = new
         {
-            phone = phoneFormat
+            phone = phoneFormat,
+            provider_code = "TEST"
         };
 
         // Act
@@ -265,6 +271,7 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         var request = new
         {
             phone = "8015551234",
+            provider_code = "TEST",
             unique_id = uniqueId
         };
 

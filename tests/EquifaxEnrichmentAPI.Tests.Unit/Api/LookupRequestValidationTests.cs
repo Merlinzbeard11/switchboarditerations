@@ -26,7 +26,7 @@ public class LookupRequestValidationTests
     // X-API-Key header - no api_key field in request body
     // ============================================================================
 
-    [Fact(Skip = "MVP Phase 1 - Provider code validation deferred to future slice (BDD Scenario 6)")]
+    [Fact]
     public void Validate_MissingProviderCode_ReturnsValidationError()
     {
         // Arrange
