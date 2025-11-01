@@ -1,0 +1,6 @@
+{
+  "EquifaxEnrichmentAPI.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/merlinzbeard\/projects\/Viable product\/src\/EquifaxEnrichmentAPI.Api",
+  "EquifaxEnrichmentAPI.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/merlinzbeard\/projects\/Viable product\/src\/EquifaxEnrichmentAPI.Application",
+  "EquifaxEnrichmentAPI.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/merlinzbeard\/projects\/Viable product\/src\/EquifaxEnrichmentAPI.Domain",
+  "EquifaxEnrichmentAPI.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/merlinzbeard\/projects\/Viable product\/src\/EquifaxEnrichmentAPI.Infrastructure"
+}

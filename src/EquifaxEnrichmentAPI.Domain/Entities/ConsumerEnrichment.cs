@@ -25,8 +25,47 @@ public class ConsumerEnrichment
     /// <summary>
     /// Normalized phone number (10 digits, no formatting)
     /// BDD Scenario 10: Phone normalization handling
+    /// NOTE: Legacy field - new searches use Phone1-Phone10
     /// </summary>
     public string NormalizedPhone { get; private set; } = string.Empty;
+
+    // ====================================================================
+    // Feature 1.3: Multi-Phone Search Enhancement
+    // BDD File: features/phase1/feature-1.3-database-query-multi-phone.feature
+    //
+    // Up to 10 phone numbers per consumer record for improved match coverage.
+    // Confidence scoring: Phone1 = 100%, Phone2 = 95%, ..., Phone10 = 55%
+    // ====================================================================
+
+    /// <summary>Phone #1 (Primary) - 100% confidence match</summary>
+    public string? Phone1 { get; private set; }
+
+    /// <summary>Phone #2 (Secondary) - 95% confidence match</summary>
+    public string? Phone2 { get; private set; }
+
+    /// <summary>Phone #3 - 90% confidence match</summary>
+    public string? Phone3 { get; private set; }
+
+    /// <summary>Phone #4 - 85% confidence match</summary>
+    public string? Phone4 { get; private set; }
+
+    /// <summary>Phone #5 - 80% confidence match</summary>
+    public string? Phone5 { get; private set; }
+
+    /// <summary>Phone #6 - 75% confidence match</summary>
+    public string? Phone6 { get; private set; }
+
+    /// <summary>Phone #7 - 70% confidence match</summary>
+    public string? Phone7 { get; private set; }
+
+    /// <summary>Phone #8 - 65% confidence match</summary>
+    public string? Phone8 { get; private set; }
+
+    /// <summary>Phone #9 - 60% confidence match</summary>
+    public string? Phone9 { get; private set; }
+
+    /// <summary>Phone #10 - 55% confidence match</summary>
+    public string? Phone10 { get; private set; }
 
     /// <summary>
     /// Match confidence score (0.0 to 1.0)
