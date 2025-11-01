@@ -51,13 +51,13 @@ public partial class LookupRequestDtoValidator : AbstractValidator<LookupRequest
             .Must(BeValidPhoneNumber)
             .WithMessage("Invalid phone number format");
 
-        // FUTURE: Permissible Purpose validation (BDD Scenario 8)
-        // RuleFor(x => x.PermissiblePurpose)
-        //     .Cascade(CascadeMode.Stop)
-        //     .NotEmpty()
-        //     .WithMessage("permissible_purpose is required")
-        //     .Must(BeValidPermissiblePurpose)
-        //     .WithMessage($"Invalid permissible purpose. Valid values: {string.Join(", ", ValidPermissiblePurposes)}");
+        // Slice 10: Permissible Purpose validation (BDD Scenario 8)
+        RuleFor(x => x.PermissiblePurpose)
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty()
+            .WithMessage("permissible_purpose is required")
+            .Must(BeValidPermissiblePurpose)
+            .WithMessage($"Invalid permissible purpose. Valid values: {string.Join(", ", ValidPermissiblePurposes)}");
 
         // ====================================================================
         // OPTIONAL FIELDS VALIDATION

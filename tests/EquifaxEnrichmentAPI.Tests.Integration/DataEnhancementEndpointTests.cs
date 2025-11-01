@@ -45,6 +45,7 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         {
             phone = "8015551234",
             provider_code = "TEST",
+            permissible_purpose = "insurance_underwriting",
             fields = "basic"
         };
 
@@ -84,7 +85,8 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         var request = new
         {
             phone = "8015551234",
-            provider_code = "TEST"
+            provider_code = "TEST",
+            permissible_purpose = "insurance_underwriting"
         };
 
         // Act
@@ -118,6 +120,7 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         {
             phone = "8015551234",
             provider_code = "TEST",
+            permissible_purpose = "insurance_underwriting",
             fields = "full"
         };
 
@@ -148,6 +151,7 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         {
             phone = "8015551234",
             provider_code = "TEST",
+            permissible_purpose = "insurance_underwriting",
             first_name = "Bob",
             last_name = "Barker",
             postal_code = "84010",
@@ -191,7 +195,8 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         var request = new
         {
             phone = "5559999999",
-            provider_code = "TEST"
+            provider_code = "TEST",
+            permissible_purpose = "insurance_underwriting"
         };
 
         // Act
@@ -236,7 +241,8 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         var request = new
         {
             phone = phoneFormat,
-            provider_code = "TEST"
+            provider_code = "TEST",
+            permissible_purpose = "insurance_underwriting"
         };
 
         // Act
@@ -272,6 +278,7 @@ public class DataEnhancementEndpointTests : IClassFixture<WebApplicationFactory<
         {
             phone = "8015551234",
             provider_code = "TEST",
+            permissible_purpose = "insurance_underwriting",
             unique_id = uniqueId
         };
 

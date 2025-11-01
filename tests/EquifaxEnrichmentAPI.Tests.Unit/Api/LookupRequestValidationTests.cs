@@ -64,7 +64,7 @@ public class LookupRequestValidationTests
             .WithErrorMessage("phone is required");
     }
 
-    [Fact(Skip = "MVP Phase 1 - Permissible purpose validation deferred to future slice (BDD Scenario 8)")]
+    [Fact]
     public void Validate_MissingPermissiblePurpose_ReturnsValidationError()
     {
         // Arrange
@@ -140,7 +140,7 @@ public class LookupRequestValidationTests
     // BDD Lines 207-220
     // ============================================================================
 
-    [Fact(Skip = "MVP Phase 1 - Permissible purpose validation deferred to future slice (BDD Scenario 8)")]
+    [Fact]
     public void Validate_InvalidPermissiblePurpose_ReturnsValidationError()
     {
         // Arrange
