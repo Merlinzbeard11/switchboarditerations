@@ -26,6 +26,16 @@ public class ApiKeyAuthenticationMiddleware
 
     public async Task InvokeAsync(HttpContext context, EnrichmentDbContext dbContext)
     {
+        // CRITICAL: Skip authentication for health check endpoint (AWS ECS/ALB requirement)
+        // Health checks must be unauthenticated for load balancer monitoring
+        // SWAGGER: Skip authentication for Swagger UI and JSON endpoints (public documentation)
+        if (context.Request.Path.StartsWithSegments("/health") ||
+            context.Request.Path.StartsWithSegments("/swagger"))
+        {
+            await _next(context);
+            return;
+        }
+
         // BDD Scenario 2: Missing API key (401 Unauthorized)
         if (!context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var apiKeyHeader))
         {

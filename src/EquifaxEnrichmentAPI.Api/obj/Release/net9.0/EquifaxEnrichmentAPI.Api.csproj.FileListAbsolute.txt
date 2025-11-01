@@ -147,3 +147,6 @@
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/obj/Release/net9.0/EquifaxEnrichmentAPI.Api.pdb
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/obj/Release/net9.0/EquifaxEnrichmentAPI.Api.genruntimeconfig.cache
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/obj/Release/net9.0/ref/EquifaxEnrichmentAPI.Api.dll
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/bin/Release/net9.0/appsettings.Production.json
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/bin/Release/net9.0/EquifaxEnrichmentAPI.Api.xml
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/obj/Release/net9.0/EquifaxEnrichmentAPI.Api.xml

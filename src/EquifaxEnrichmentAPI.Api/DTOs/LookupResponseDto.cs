@@ -114,7 +114,7 @@ public class ResponseMetadataDto
 
     /// <summary>
     /// Response time in milliseconds
-    /// BDD Scenario 13: Should be < 200ms for basic, < 300ms for full
+    /// BDD Scenario 13: Should be &lt; 200ms for basic, &lt; 300ms for full
     /// </summary>
     [JsonPropertyName("response_time_ms")]
     public int ResponseTimeMs { get; set; }

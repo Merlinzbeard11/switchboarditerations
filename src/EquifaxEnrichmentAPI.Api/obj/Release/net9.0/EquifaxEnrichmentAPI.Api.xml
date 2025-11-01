@@ -1,0 +1,311 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EquifaxEnrichmentAPI.Api</name>
+    </assembly>
+    <members>
+        <member name="T:EquifaxEnrichmentAPI.Api.Controllers.DataEnhancementController">
+             <summary>
+             Data Enhancement API Controller for phone number enrichment.
+             BDD Feature: REST API Endpoint for Phone Number Enrichment
+             BDD File: features/phase1/feature-1.1-rest-api-endpoint.feature
+            
+             NOTE: This is Slice 3 implementation with CQRS/MediatR pattern.
+             Controller is thin - all business logic in LookupQueryHandler.
+             Future slices will add: authentication, database lookup, FCRA audit logging, rate limiting.
+             </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:EquifaxEnrichmentAPI.Api.Controllers.DataEnhancementController.Lookup(EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto)" -->
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto">
+            <summary>
+            Request DTO for phone number enrichment lookup.
+            Maps to BDD Scenario 1-3: Basic fields, full fields, and optional fields for improved matching.
+            BDD File: features/phase1/feature-1.1-rest-api-endpoint.feature
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.ProviderCode">
+            <summary>
+            Provider code identifying the data source (required)
+            Expected value: "EQUIFAX_ENRICHMENT"
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.Phone">
+            <summary>
+            Phone number to enrich (required)
+            Supports multiple formats - will be normalized using PhoneNumber value object
+            BDD Scenario 7: Phone number format validation
+            BDD Scenario 10: Phone number normalization
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.PermissiblePurpose">
+            <summary>
+            FCRA-compliant permissible purpose for data access (required)
+            Valid values: insurance_underwriting, credit_extension, employment_screening,
+            tenant_screening, legitimate_business_need
+            BDD Scenario 8: Permissible purpose validation
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.Fields">
+            <summary>
+            Fields to return: "basic" (~50 fields) or "full" (398 fields)
+            Defaults to "basic" if not specified
+            BDD Scenario 2: Full dataset request
+            BDD Scenario 11: Default fields selection
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.FirstName">
+            <summary>
+            Consumer first name (optional, improves match confidence)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.LastName">
+            <summary>
+            Consumer last name (optional, improves match confidence)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.PostalCode">
+            <summary>
+            5-digit US postal code (optional, improves match confidence)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.State">
+            <summary>
+            2-letter US state code (optional, improves match confidence)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.IpAddress">
+            <summary>
+            IPv4 address (optional, for additional context)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.UniqueId">
+            <summary>
+            Client-provided unique identifier for request tracking (optional)
+            Returned in response metadata for correlation
+            BDD Scenario 12: Metadata completeness
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.LookupResponseDto">
+            <summary>
+            Response DTO for successful phone number enrichment lookup.
+            BDD Scenarios 1, 2, 3: Success responses with data
+            BDD File: features/phase1/feature-1.1-rest-api-endpoint.feature
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupResponseDto.Response">
+            <summary>
+            Response status: "success" or "error"
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupResponseDto.Message">
+            <summary>
+            Human-readable message describing the result
+            Example: "Record found with high confidence"
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupResponseDto.Data">
+            <summary>
+            Enrichment data payload (null for error responses)
+            BDD Scenario 1: Contains ~50 fields for "basic"
+            BDD Scenario 2: Contains 398 fields for "full"
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupResponseDto.Metadata">
+            <summary>
+            Response metadata for tracking and monitoring
+            BDD Scenario 12: Complete metadata requirements
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto">
+            <summary>
+            Enrichment data structure containing consumer information.
+            BDD Scenario 1: Basic structure with personal info, addresses, phones, financial
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto.ConsumerKey">
+            <summary>
+            Equifax consumer key identifier
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto.PersonalInfo">
+            <summary>
+            Personal information (name, age, etc.)
+            Placeholder for now - will be expanded in later iterations
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto.Addresses">
+            <summary>
+            Address history
+            Placeholder for now - will be expanded in later iterations
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto.Phones">
+            <summary>
+            Phone number history
+            Placeholder for now - will be expanded in later iterations
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto.Financial">
+            <summary>
+            Financial information
+            Placeholder for now - will be expanded in later iterations
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto">
+            <summary>
+            Response metadata for tracking, monitoring, and auditing.
+            BDD Scenario 12: Complete metadata requirements (Lines 285-306)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.MatchConfidence">
+            <summary>
+            Match confidence score (0.0 to 1.0)
+            BDD Scenario 3: Should be > 0.90 with optional fields
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.MatchType">
+            <summary>
+            Type of match performed (e.g., "phone_only", "phone_with_name")
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.DataFreshnessDate">
+            <summary>
+            Date when the data was last updated (ISO 8601 format)
+            BDD Scenario 12: Valid ISO 8601 date
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.QueryTimestamp">
+            <summary>
+            Timestamp when the query was executed (UTC)
+            BDD Scenario 12: Current UTC timestamp
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.ResponseTimeMs" -->
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.RequestId">
+            <summary>
+            Server-generated request ID (UUID format)
+            BDD Scenario 12: Non-empty UUID format
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.UniqueId">
+            <summary>
+            Client-provided unique ID (echoed from request)
+            BDD Scenario 3, 12: Optional tracking identifier
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.TotalFieldsReturned">
+            <summary>
+            Total number of fields returned (null for basic, 398 for full)
+            BDD Scenario 2: Should show 398 for full dataset
+            BDD Scenario 11: null for basic (default)
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.ErrorResponseDto">
+            <summary>
+            Error response DTO for failed lookups.
+            BDD Scenario 4: No match found
+            BDD Scenario 5: Invalid API key
+            BDD Scenario 6: Missing required fields
+            BDD Scenario 7: Invalid phone format
+            BDD Scenario 8: Invalid permissible purpose
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ErrorResponseDto.Response">
+            <summary>
+            Response status: always "error"
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ErrorResponseDto.Message">
+            <summary>
+            Error message describing what went wrong
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ErrorResponseDto.Data">
+            <summary>
+            Optional error details (e.g., phone number attempted for no-match)
+            BDD Scenario 4: Includes phone, match_attempted, match_confidence
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ErrorResponseDto.Metadata">
+            <summary>
+            Metadata (present for some errors, absent for others)
+            BDD Scenario 4: No match includes metadata
+            BDD Scenario 5: Invalid API key does NOT include metadata
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDtoValidator">
+            <summary>
+            FluentValidation validator for LookupRequestDto.
+            Implements validation rules from BDD Scenarios 6, 7, 8, 11.
+            BDD File: features/phase1/feature-1.1-rest-api-endpoint.feature
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDtoValidator.BeValidPhoneNumber(System.String)">
+            <summary>
+            Validates phone number using PhoneNumber value object.
+            BDD Scenario 7: Invalid Phone Number Format
+            BDD Scenario 10: Phone normalization handling
+            Lines 182-269
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDtoValidator.BeValidPermissiblePurpose(System.String)">
+            <summary>
+            Validates permissible purpose against FCRA-compliant list.
+            BDD Scenario 8: Invalid Permissible Purpose
+            Lines 207-220
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDtoValidator.BeValidFieldsOption(System.String)">
+            <summary>
+            Validates fields parameter against allowed values.
+            BDD Scenario 2: Full dataset request
+            BDD Scenario 11: Default fields selection
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDtoValidator.BeValidIpAddress(System.String)">
+            <summary>
+            Validates IPv4 address format.
+            BDD Scenario 3: Optional fields validation
+            Requires exactly 4 octets (xxx.xxx.xxx.xxx)
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.Middleware.ApiKeyAuthenticationMiddleware">
+             <summary>
+             API Key Authentication Middleware with timing-attack prevention.
+             BDD Feature: API Key Authentication (feature-2.1-api-key-authentication.feature)
+            
+             SECURITY CRITICAL:
+             - BDD Scenario 4: Uses CryptographicOperations.FixedTimeEquals() to prevent timing attacks (CVE-2025-59425)
+             - BDD Scenario 8: Compares SHA-256 hashes, NEVER plaintext keys
+             - BDD Scenario 23: Constant-time hash comparison
+             </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Middleware.ApiKeyAuthenticationMiddleware.ComputeSha256Hash(System.String)">
+            <summary>
+            Computes SHA-256 hash of API key and returns Base64-encoded string.
+            BDD Scenario 8: Store API key as SHA-256 hash in database
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Middleware.ApiKeyAuthenticationMiddleware.PerformDummyTimingAttackMitigation(System.String)">
+             <summary>
+             Performs a dummy constant-time operation to prevent timing attacks.
+             BDD Scenario 4: Use constant-time comparison to prevent timing attacks
+            
+             When API key is not found, we still perform a hash comparison against a dummy value
+             to ensure the response time is constant regardless of whether the key exists.
+             </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Middleware.ApiKeyAuthenticationMiddleware.WriteUnauthorizedResponse(Microsoft.AspNetCore.Http.HttpContext,System.String,System.String)">
+            <summary>
+            Writes 401 Unauthorized response with error details.
+            BDD Scenario 2, 3, 5: Return 401 for authentication failures
+            BDD Scenario 22: Never log full API keys (security best practice)
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.Middleware.ApiKeyAuthenticationMiddlewareExtensions">
+            <summary>
+            Extension method to register API Key Authentication Middleware.
+            </summary>
+        </member>
+    </members>
+</doc>

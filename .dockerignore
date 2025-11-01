@@ -1,0 +1,72 @@
+# ============================================================================
+# .dockerignore - Exclude files from Docker build context
+# Reduces build time and image size by excluding unnecessary files
+# ============================================================================
+
+# Build output directories
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# Test projects (not needed in production image)
+**/tests/
+**/*.Tests/
+**/*.Tests.Unit/
+**/*.Tests.Integration/
+**/test-results/
+
+# NuGet packages (will be restored during build)
+**/.nuget/
+**/packages/
+
+# IDE and editor files
+**/.vs/
+**/.vscode/
+**/.idea/
+**/*.user
+**/*.suo
+**/*.swp
+**/*~
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD files
+.github/
+**/*.yml
+**/*.yaml
+
+# Documentation
+README.md
+LICENSE
+**/*.md
+# **/docs/ - COMMENTED OUT: docs folder now contains full-enrichment-example.json needed in production
+
+# Docker files themselves (don't need in context)
+**/Dockerfile
+**/.dockerignore
+
+# Local development files
+**/.env
+**/.env.local
+**/appsettings.Development.json
+**/launchSettings.json
+
+# Mac OS files
+**/.DS_Store
+
+# Node modules (if any frontend tooling)
+**/node_modules/
+
+# Tools and scripts
+**/tools/
+
+# Database migration artifacts (will run in production)
+**/Migrations/*.Designer.cs
+
+# Logs
+**/logs/
+**/*.log
