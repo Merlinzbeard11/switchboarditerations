@@ -63,9 +63,13 @@ builder.Services.AddSingleton<StackExchange.Redis.IConnectionMultiplexer>(sp =>
 // ====================================================================
 // FCRA AUDIT LOGGING SERVICE
 // Background service using Channel<T> for fire-and-forget async logging
+// Registered as both IAuditLoggingService (for DI) and IHostedService (for background execution)
 // ====================================================================
-builder.Services.AddHostedService<EquifaxEnrichmentAPI.Api.Services.AuditLoggingService>();
 builder.Services.AddSingleton<EquifaxEnrichmentAPI.Api.Services.AuditLoggingService>();
+builder.Services.AddSingleton<EquifaxEnrichmentAPI.Api.Services.IAuditLoggingService>(sp =>
+    sp.GetRequiredService<EquifaxEnrichmentAPI.Api.Services.AuditLoggingService>());
+builder.Services.AddHostedService(sp =>
+    sp.GetRequiredService<EquifaxEnrichmentAPI.Api.Services.AuditLoggingService>());
 
 // ====================================================================
 // DEPENDENCY INJECTION
@@ -305,6 +309,11 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Equifax Enrichment API v1");
     c.RoutePrefix = "swagger"; // Swagger UI at /swagger (bypasses auth middleware)
     c.DocumentTitle = "Equifax Enrichment API Documentation";
+
+    // UX Enhancement: Expand DTO fields by default for better documentation discoverability
+    c.DefaultModelExpandDepth(2);        // Expand model fields 2 levels deep (shows field descriptions)
+    c.DefaultModelsExpandDepth(1);       // Keep Models section visible
+    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None); // Keep operations collapsed
 });
 
 // HTTPS Redirection: Only in development
