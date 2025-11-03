@@ -3,9 +3,10 @@ using System.Text.Json.Serialization;
 namespace EquifaxEnrichmentAPI.Api.DTOs;
 
 /// <summary>
-/// Response DTO for successful phone number enrichment lookup.
-/// BDD Scenarios 1, 2, 3: Success responses with data
-/// BDD File: features/phase1/feature-1.1-rest-api-endpoint.feature
+/// Successful response returned when enrichment data is found.
+///
+/// This is the complete package you receive back: includes the enrichment data,
+/// a success message, and metadata showing match quality and performance metrics.
 /// </summary>
 public class LookupResponseDto
 {
@@ -24,23 +25,23 @@ public class LookupResponseDto
 
     /// <summary>
     /// Enrichment data payload (null for error responses)
-    /// BDD Scenario 1: Contains ~50 fields for "basic"
-    /// BDD Scenario 2: Contains 398 fields for "full"
+    /// Contains ~50 fields for "basic" or 398 fields for "full"
     /// </summary>
     [JsonPropertyName("data")]
     public EnrichmentDataDto? Data { get; set; }
 
     /// <summary>
     /// Response metadata for tracking and monitoring
-    /// BDD Scenario 12: Complete metadata requirements
     /// </summary>
     [JsonPropertyName("metadata")]
     public ResponseMetadataDto Metadata { get; set; } = new();
 }
 
 /// <summary>
-/// Enrichment data structure containing consumer information.
-/// BDD Scenario 1: Basic structure with personal info, addresses, phones, financial
+/// The actual enrichment data - this is what you're paying for!
+///
+/// Contains detailed consumer information including personal details, address history,
+/// phone numbers, and financial indicators. This is the core product delivered by the API.
 /// </summary>
 public class EnrichmentDataDto
 {
@@ -80,14 +81,17 @@ public class EnrichmentDataDto
 }
 
 /// <summary>
-/// Response metadata for tracking, monitoring, and auditing.
-/// BDD Scenario 12: Complete metadata requirements (Lines 285-306)
+/// Quality report and tracking information for the response.
+///
+/// Shows match confidence (how sure we are it's the right person), response time,
+/// data freshness, and tracking IDs. Think of it as the receipt and quality guarantee
+/// label attached to your order.
 /// </summary>
 public class ResponseMetadataDto
 {
     /// <summary>
     /// Match confidence score (0.0 to 1.0)
-    /// BDD Scenario 3: Should be > 0.90 with optional fields
+    /// Higher scores indicate better match quality
     /// </summary>
     [JsonPropertyName("match_confidence")]
     public double MatchConfidence { get; set; }
@@ -100,55 +104,52 @@ public class ResponseMetadataDto
 
     /// <summary>
     /// Date when the data was last updated (ISO 8601 format)
-    /// BDD Scenario 12: Valid ISO 8601 date
     /// </summary>
     [JsonPropertyName("data_freshness_date")]
     public DateTime DataFreshnessDate { get; set; }
 
     /// <summary>
     /// Timestamp when the query was executed (UTC)
-    /// BDD Scenario 12: Current UTC timestamp
     /// </summary>
     [JsonPropertyName("query_timestamp")]
     public DateTime QueryTimestamp { get; set; }
 
     /// <summary>
     /// Response time in milliseconds
-    /// BDD Scenario 13: Should be &lt; 200ms for basic, &lt; 300ms for full
+    /// Typically &lt; 200ms for basic requests, &lt; 300ms for full dataset
     /// </summary>
     [JsonPropertyName("response_time_ms")]
     public int ResponseTimeMs { get; set; }
 
     /// <summary>
     /// Server-generated request ID (UUID format)
-    /// BDD Scenario 12: Non-empty UUID format
     /// </summary>
     [JsonPropertyName("request_id")]
     public string RequestId { get; set; } = string.Empty;
 
     /// <summary>
     /// Client-provided unique ID (echoed from request)
-    /// BDD Scenario 3, 12: Optional tracking identifier
+    /// Optional tracking identifier for request correlation
     /// </summary>
     [JsonPropertyName("unique_id")]
     public string? UniqueId { get; set; }
 
     /// <summary>
     /// Total number of fields returned (null for basic, 398 for full)
-    /// BDD Scenario 2: Should show 398 for full dataset
-    /// BDD Scenario 11: null for basic (default)
     /// </summary>
     [JsonPropertyName("total_fields_returned")]
     public int? TotalFieldsReturned { get; set; }
 }
 
 /// <summary>
-/// Error response DTO for failed lookups.
-/// BDD Scenario 4: No match found
-/// BDD Scenario 5: Invalid API key
-/// BDD Scenario 6: Missing required fields
-/// BDD Scenario 7: Invalid phone format
-/// BDD Scenario 8: Invalid permissible purpose
+/// Error response returned when something goes wrong.
+///
+/// Explains what went wrong in plain language. Common errors include:
+/// - No match found for the phone number
+/// - Invalid or missing API key
+/// - Missing required fields
+/// - Invalid phone number format
+/// - Invalid permissible purpose
 /// </summary>
 public class ErrorResponseDto
 {
@@ -166,15 +167,12 @@ public class ErrorResponseDto
 
     /// <summary>
     /// Optional error details (e.g., phone number attempted for no-match)
-    /// BDD Scenario 4: Includes phone, match_attempted, match_confidence
     /// </summary>
     [JsonPropertyName("data")]
     public object? Data { get; set; }
 
     /// <summary>
     /// Metadata (present for some errors, absent for others)
-    /// BDD Scenario 4: No match includes metadata
-    /// BDD Scenario 5: Invalid API key does NOT include metadata
     /// </summary>
     [JsonPropertyName("_metadata")]
     public ResponseMetadataDto? Metadata { get; set; }

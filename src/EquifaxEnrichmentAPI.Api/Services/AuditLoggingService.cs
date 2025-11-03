@@ -7,6 +7,9 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using EquifaxEnrichmentAPI.Domain.Entities;
+using EquifaxEnrichmentAPI.Infrastructure.Persistence;
 
 namespace EquifaxEnrichmentAPI.Api.Services;
 
@@ -14,7 +17,7 @@ namespace EquifaxEnrichmentAPI.Api.Services;
 /// FCRA-compliant audit logging service using fire-and-forget Channel-based async processing.
 /// Implements batch processing and SHA-256 hashing for privacy-preserving audit trail.
 /// </summary>
-public class AuditLoggingService : BackgroundService
+public class AuditLoggingService : BackgroundService, IAuditLoggingService
 {
     private readonly Channel<AuditLogEntry> _channel;
     private readonly ILogger<AuditLoggingService> _logger;
@@ -92,6 +95,7 @@ public class AuditLoggingService : BackgroundService
 
     /// <summary>
     /// Process batch of audit log entries using EF Core bulk insert.
+    /// Gotcha #8: BackgroundService is singleton - MUST create scope for scoped DbContext
     /// </summary>
     private async Task ProcessBatchAsync(List<AuditLogEntry> batch, CancellationToken cancellationToken)
     {
@@ -99,15 +103,41 @@ public class AuditLoggingService : BackgroundService
 
         try
         {
-            // NOTE: In production, would inject DbContext via scoped service
-            // For now, using placeholder logic
+            // CRITICAL: Create scope for scoped DbContext (Gotcha #8: Singleton can't inject scoped)
+            using var scope = _serviceProvider.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<EnrichmentDbContext>();
+
             _logger.LogInformation("Processing batch of {Count} audit log entries", batch.Count);
 
-            // Batch insert using EF Core AddRangeAsync (Gotcha #3: Single transaction)
-            // await dbContext.AuditLogs.AddRangeAsync(batch, cancellationToken);
-            // await dbContext.SaveChangesAsync(cancellationToken);
+            // Map DTO to domain entities
+            var auditLogs = new List<AuditLog>(batch.Count);
+            foreach (var entry in batch)
+            {
+                // Convert string BuyerId to Guid (Gotcha #9: DTO has string, entity needs Guid)
+                if (!Guid.TryParse(entry.BuyerId, out var buyerId))
+                {
+                    _logger.LogWarning("Invalid Buyer ID format: {BuyerId}, skipping entry", entry.BuyerId);
+                    continue;
+                }
 
-            _logger.LogInformation("Successfully persisted {Count} audit log entries", batch.Count);
+                var auditLog = AuditLog.Create(
+                    buyerId: buyerId,
+                    phoneHash: entry.PhoneHash,
+                    permissiblePurpose: entry.PermissiblePurpose,
+                    response: entry.Response,
+                    statusCode: entry.StatusCode,
+                    ipAddress: entry.IpAddress,
+                    timestamp: entry.Timestamp // Database will override with NOW() for clock skew protection
+                );
+
+                auditLogs.Add(auditLog);
+            }
+
+            // Batch insert using EF Core AddRangeAsync (single transaction)
+            await dbContext.AuditLogs.AddRangeAsync(auditLogs, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Successfully persisted {Count} audit log entries to database", auditLogs.Count);
         }
         catch (Exception ex)
         {

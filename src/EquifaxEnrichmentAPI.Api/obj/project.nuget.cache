@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "SkwRMcKZ7ao=",
+  "dgSpecHash": "4Mwk+NaXfZo=",
   "success": true,
   "projectFilePath": "/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/EquifaxEnrichmentAPI.Api.csproj",
   "expectedPackageFiles": [
@@ -44,6 +44,8 @@
     "/Users/merlinzbeard/.nuget/packages/mono.texttemplating/3.0.0/mono.texttemplating.3.0.0.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/npgsql/9.0.3/npgsql.9.0.3.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.4/npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512",
+    "/Users/merlinzbeard/.nuget/packages/pipelines.sockets.unofficial/2.2.8/pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
+    "/Users/merlinzbeard/.nuget/packages/stackexchange.redis/2.9.32/stackexchange.redis.2.9.32.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/swashbuckle.aspnetcore/9.0.6/swashbuckle.aspnetcore.9.0.6.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/swashbuckle.aspnetcore.swagger/9.0.6/swashbuckle.aspnetcore.swagger.9.0.6.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/swashbuckle.aspnetcore.swaggergen/9.0.6/swashbuckle.aspnetcore.swaggergen.9.0.6.nupkg.sha512",

@@ -28,6 +28,12 @@ public class EnrichmentDbContext : DbContext
     /// </summary>
     public DbSet<Buyer> Buyers => Set<Buyer>();
 
+    /// <summary>
+    /// Audit logs for FCRA compliance tracking
+    /// BDD Feature: Audit Log Database Persistence (feature-2.4-audit-log-persistence.feature)
+    /// </summary>
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

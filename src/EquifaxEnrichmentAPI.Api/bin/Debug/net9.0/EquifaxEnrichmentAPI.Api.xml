@@ -1,0 +1,484 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EquifaxEnrichmentAPI.Api</name>
+    </assembly>
+    <members>
+        <member name="T:EquifaxEnrichmentAPI.Api.Controllers.DataEnhancementController">
+             <summary>
+             Data Enhancement API Controller for phone number enrichment.
+            
+             FCRA COMPLIANCE:
+             Every API request is logged for compliance requirements.
+            
+             ARCHITECTURE:
+             Uses CQRS/MediatR pattern - controller delegates to LookupQueryHandler.
+             </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Controllers.DataEnhancementController.Lookup(EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto)">
+             <summary>
+             Enrich phone number with comprehensive consumer data
+             </summary>
+             <remarks>
+             Returns detailed consumer information associated with a phone number, including personal data,
+             address history, phone history, and financial indicators.
+            
+             ## Request Fields
+            
+             **Required:**
+             - `phone` (string): Phone number to enrich (formats: "555-123-4567", "5551234567", "(555) 123-4567")
+            
+             **Optional (Improves Match Confidence):**
+             - `first_name` (string): Consumer first name
+             - `last_name` (string): Consumer last name
+             - `postal_code` (string): 5-digit ZIP code
+             - `state` (string): 2-letter state code (e.g., "CA", "NY")
+             - `ip_address` (string): Client IP address for audit logging
+             - `unique_id` (string): Your tracking identifier (echoed back in response)
+             - `fields` (string): "basic" (default, ~50 fields) or "full" (398 fields)
+            
+             ## Response Fields
+            
+             ### Success Response (`response: "success"`)
+            
+             **data.consumer_key** (string): Unique Equifax consumer identifier
+            
+             **data.personal_info** (object):
+             - `first_name`: Legal first name
+             - `middle_name`: Middle name or initial
+             - `last_name`: Legal last name
+             - `name_suffix`: Suffix (Jr., Sr., III, etc.)
+             - `age`: Current age
+             - `date_of_birth`: Date of birth (YYYY-MM-DD)
+             - `gender`: Gender (M/F)
+             - `marital_status`: Marital status
+             - `education_level`: Highest education level
+             - `email_addresses`: Array of known email addresses
+            
+             **data.addresses** (array): Address history (most recent first)
+             - `street_address`: Street address
+             - `unit`: Apartment/unit number
+             - `city`: City name
+             - `state`: 2-letter state code
+             - `postal_code`: 5-digit ZIP code
+             - `postal_code_plus4`: ZIP+4 code
+             - `county`: County name
+             - `country`: Country code
+             - `address_type`: Type (Current, Previous, Mailing, etc.)
+             - `residence_type`: Type (Single Family, Apartment, Condo, etc.)
+             - `move_in_date`: Date moved in (YYYY-MM-DD)
+             - `move_out_date`: Date moved out (YYYY-MM-DD, null if current)
+             - `length_of_residence_months`: Months at this address
+             - `ownership_status`: Own, Rent, Unknown
+            
+             **data.phones** (array): Phone number history
+             - `phone_number`: Phone number (normalized format)
+             - `phone_type`: Type (Mobile, Landline, VoIP, etc.)
+             - `carrier`: Telecom carrier name
+             - `is_current`: Active phone number (true/false)
+             - `first_seen_date`: First association date
+             - `last_seen_date`: Last verification date
+             - `line_type`: Wireless, Wireline, VoIP, etc.
+             - `do_not_call_registered`: DNC registry status
+            
+             **data.financial** (object): Financial indicators
+             - `estimated_income_range`: Income bracket
+             - `credit_score_range`: Credit score range (e.g., "700-749")
+             - `homeowner`: Homeownership status (true/false)
+             - `estimated_home_value`: Estimated property value
+             - `mortgage_amount`: Outstanding mortgage balance
+             - `vehicle_ownership`: Number of vehicles owned
+             - `occupation_category`: Job category
+             - `employment_status`: Employment status
+            
+             **metadata** (object): Response metadata
+             - `match_confidence` (0.0-1.0): Confidence score (> 0.7 recommended)
+             - `match_type`: Type of match performed
+             - `data_freshness_date`: When data was last updated
+             - `query_timestamp`: Request timestamp (UTC)
+             - `response_time_ms`: Response time in milliseconds
+             - `request_id`: Server-generated UUID
+             - `unique_id`: Your tracking ID (if provided)
+             - `total_fields_returned`: Total fields in response
+            
+             ### Error Response (`response: "error"`)
+            
+             **Common Error Messages:**
+             - "No consumer record found" - Phone number has no matching data
+             - "Invalid phone number format" - Phone format not recognized
+             - "Missing required field: phone" - Phone parameter not provided
+             - "Invalid API key" - Authentication failed
+             - "Rate limit exceeded" - Too many requests
+            
+             ## Performance
+            
+             - Basic request: &lt; 200ms average response time
+             - Full request: &lt; 300ms average response time
+             - Match confidence &gt; 0.90 with first_name, last_name, postal_code
+             - Match confidence 0.60-0.80 with phone only
+            
+             ## Best Practices
+            
+             1. Always include first_name, last_name, postal_code for highest match confidence
+             2. Use unique_id to correlate requests with your internal systems
+             3. Monitor match_confidence scores - investigate scores &lt; 0.7
+             4. Handle "no match" responses gracefully - not all numbers have data
+             5. Use "basic" fields for faster responses unless you need complete dataset
+             </remarks>
+             <param name="request">Lookup request with phone and optional matching fields</param>
+             <returns>Enrichment data with consumer information, or error response if no match found</returns>
+             <response code="200">Successfully enriched phone number with consumer data</response>
+             <response code="400">Invalid request format or missing required fields</response>
+             <response code="401">Invalid or missing API key</response>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto">
+             <summary>
+             Request payload for phone number enrichment lookup.
+            
+             This is what you send when requesting enrichment data for a phone number.
+             Think of it as an order form: provide the phone number (required) and any optional
+             details (name, address) to improve match accuracy.
+             </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.ProviderCode">
+            <summary>
+            Provider code identifying the data source (required)
+            Expected value: "EQUIFAX_ENRICHMENT"
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.Phone">
+            <summary>
+            Phone number to enrich (required)
+            Supports multiple formats - will be normalized automatically
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.PermissiblePurpose">
+            <summary>
+            FCRA-compliant permissible purpose for data access (required)
+            Valid values: insurance_underwriting, credit_extension, employment_screening,
+            tenant_screening, legitimate_business_need
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.Fields">
+            <summary>
+            Fields to return: "basic" (~50 fields) or "full" (398 fields)
+            Defaults to "basic" if not specified
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.FirstName">
+            <summary>
+            Consumer first name (optional, improves match confidence)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.LastName">
+            <summary>
+            Consumer last name (optional, improves match confidence)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.PostalCode">
+            <summary>
+            5-digit US postal code (optional, improves match confidence)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.State">
+            <summary>
+            2-letter US state code (optional, improves match confidence)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.IpAddress">
+            <summary>
+            IPv4 address (optional, for additional context)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDto.UniqueId">
+            <summary>
+            Client-provided unique identifier for request tracking (optional)
+            Returned in response metadata for correlation
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.LookupResponseDto">
+             <summary>
+             Successful response returned when enrichment data is found.
+            
+             This is the complete package you receive back: includes the enrichment data,
+             a success message, and metadata showing match quality and performance metrics.
+             </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupResponseDto.Response">
+            <summary>
+            Response status: "success" or "error"
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupResponseDto.Message">
+            <summary>
+            Human-readable message describing the result
+            Example: "Record found with high confidence"
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupResponseDto.Data">
+            <summary>
+            Enrichment data payload (null for error responses)
+            Contains ~50 fields for "basic" or 398 fields for "full"
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.LookupResponseDto.Metadata">
+            <summary>
+            Response metadata for tracking and monitoring
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto">
+             <summary>
+             The actual enrichment data - this is what you're paying for!
+            
+             Contains detailed consumer information including personal details, address history,
+             phone numbers, and financial indicators. This is the core product delivered by the API.
+             </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto.ConsumerKey">
+            <summary>
+            Equifax consumer key identifier
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto.PersonalInfo">
+            <summary>
+            Personal information (name, age, etc.)
+            Placeholder for now - will be expanded in later iterations
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto.Addresses">
+            <summary>
+            Address history
+            Placeholder for now - will be expanded in later iterations
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto.Phones">
+            <summary>
+            Phone number history
+            Placeholder for now - will be expanded in later iterations
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.EnrichmentDataDto.Financial">
+            <summary>
+            Financial information
+            Placeholder for now - will be expanded in later iterations
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto">
+             <summary>
+             Quality report and tracking information for the response.
+            
+             Shows match confidence (how sure we are it's the right person), response time,
+             data freshness, and tracking IDs. Think of it as the receipt and quality guarantee
+             label attached to your order.
+             </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.MatchConfidence">
+            <summary>
+            Match confidence score (0.0 to 1.0)
+            Higher scores indicate better match quality
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.MatchType">
+            <summary>
+            Type of match performed (e.g., "phone_only", "phone_with_name")
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.DataFreshnessDate">
+            <summary>
+            Date when the data was last updated (ISO 8601 format)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.QueryTimestamp">
+            <summary>
+            Timestamp when the query was executed (UTC)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.ResponseTimeMs">
+            <summary>
+            Response time in milliseconds
+            Typically &lt; 200ms for basic requests, &lt; 300ms for full dataset
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.RequestId">
+            <summary>
+            Server-generated request ID (UUID format)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.UniqueId">
+            <summary>
+            Client-provided unique ID (echoed from request)
+            Optional tracking identifier for request correlation
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ResponseMetadataDto.TotalFieldsReturned">
+            <summary>
+            Total number of fields returned (null for basic, 398 for full)
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.ErrorResponseDto">
+             <summary>
+             Error response returned when something goes wrong.
+            
+             Explains what went wrong in plain language. Common errors include:
+             - No match found for the phone number
+             - Invalid or missing API key
+             - Missing required fields
+             - Invalid phone number format
+             - Invalid permissible purpose
+             </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ErrorResponseDto.Response">
+            <summary>
+            Response status: always "error"
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ErrorResponseDto.Message">
+            <summary>
+            Error message describing what went wrong
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ErrorResponseDto.Data">
+            <summary>
+            Optional error details (e.g., phone number attempted for no-match)
+            </summary>
+        </member>
+        <member name="P:EquifaxEnrichmentAPI.Api.DTOs.ErrorResponseDto.Metadata">
+            <summary>
+            Metadata (present for some errors, absent for others)
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDtoValidator">
+            <summary>
+            FluentValidation validator for LookupRequestDto.
+            Implements validation rules from BDD Scenarios 6, 7, 8, 11.
+            BDD File: features/phase1/feature-1.1-rest-api-endpoint.feature
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDtoValidator.BeValidPhoneNumber(System.String)">
+            <summary>
+            Validates phone number using PhoneNumber value object.
+            BDD Scenario 7: Invalid Phone Number Format
+            BDD Scenario 10: Phone normalization handling
+            Lines 182-269
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDtoValidator.BeValidPermissiblePurpose(System.String)">
+            <summary>
+            Validates permissible purpose against FCRA-compliant list.
+            BDD Scenario 8: Invalid Permissible Purpose
+            Lines 207-220
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDtoValidator.BeValidFieldsOption(System.String)">
+            <summary>
+            Validates fields parameter against allowed values.
+            BDD Scenario 2: Full dataset request
+            BDD Scenario 11: Default fields selection
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.DTOs.LookupRequestDtoValidator.BeValidIpAddress(System.String)">
+            <summary>
+            Validates IPv4 address format.
+            BDD Scenario 3: Optional fields validation
+            Requires exactly 4 octets (xxx.xxx.xxx.xxx)
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.Middleware.ApiKeyAuthenticationMiddleware">
+             <summary>
+             API Key Authentication Middleware with timing-attack prevention.
+             BDD Feature: API Key Authentication (feature-2.1-api-key-authentication.feature)
+            
+             SECURITY CRITICAL:
+             - BDD Scenario 4: Uses CryptographicOperations.FixedTimeEquals() to prevent timing attacks (CVE-2025-59425)
+             - BDD Scenario 8: Compares SHA-256 hashes, NEVER plaintext keys
+             - BDD Scenario 23: Constant-time hash comparison
+             </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Middleware.ApiKeyAuthenticationMiddleware.ComputeSha256Hash(System.String)">
+            <summary>
+            Computes SHA-256 hash of API key and returns Base64-encoded string.
+            BDD Scenario 8: Store API key as SHA-256 hash in database
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Middleware.ApiKeyAuthenticationMiddleware.PerformDummyTimingAttackMitigation(System.String)">
+             <summary>
+             Performs a dummy constant-time operation to prevent timing attacks.
+             BDD Scenario 4: Use constant-time comparison to prevent timing attacks
+            
+             When API key is not found, we still perform a hash comparison against a dummy value
+             to ensure the response time is constant regardless of whether the key exists.
+             </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Middleware.ApiKeyAuthenticationMiddleware.WriteUnauthorizedResponse(Microsoft.AspNetCore.Http.HttpContext,System.String,System.String)">
+            <summary>
+            Writes 401 Unauthorized response with error details.
+            BDD Scenario 2, 3, 5: Return 401 for authentication failures
+            BDD Scenario 22: Never log full API keys (security best practice)
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.Middleware.ApiKeyAuthenticationMiddlewareExtensions">
+            <summary>
+            Extension method to register API Key Authentication Middleware.
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.Middleware.RateLimitingMiddleware">
+            <summary>
+            Distributed rate limiting middleware using Redis with Lua scripts for atomic operations.
+            Implements sliding window algorithm to prevent boundary burst issues.
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Middleware.RateLimitingMiddleware.CheckRateLimitAsync(System.String)">
+            <summary>
+            Check rate limit using Lua script for atomic operations.
+            Implements sliding window algorithm to prevent boundary burst issues.
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Middleware.RateLimitingMiddleware.TrackOverageAsync(System.String)">
+            <summary>
+            Track overage requests for billing purposes ($0.035 per call over quota).
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.Services.AuditLoggingService">
+            <summary>
+            FCRA-compliant audit logging service using fire-and-forget Channel-based async processing.
+            Implements batch processing and SHA-256 hashing for privacy-preserving audit trail.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:EquifaxEnrichmentAPI.Api.Services.AuditLoggingService.LogRequestAsync(EquifaxEnrichmentAPI.Api.Services.AuditLogEntry,System.Threading.CancellationToken)" -->
+        <member name="M:EquifaxEnrichmentAPI.Api.Services.AuditLoggingService.ExecuteAsync(System.Threading.CancellationToken)">
+            <summary>
+            Background worker that processes audit log entries in batches.
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Services.AuditLoggingService.ProcessBatchAsync(System.Collections.Generic.List{EquifaxEnrichmentAPI.Api.Services.AuditLogEntry},System.Threading.CancellationToken)">
+            <summary>
+            Process batch of audit log entries using EF Core bulk insert.
+            Gotcha #8: BackgroundService is singleton - MUST create scope for scoped DbContext
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Services.AuditLoggingService.HashPhone(System.String)">
+            <summary>
+            Hash phone number using SHA-256 for privacy-preserving audit trail.
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.Services.AuditLogEntry">
+            <summary>
+            Represents a single audit log entry for FCRA compliance.
+            </summary>
+        </member>
+        <member name="T:EquifaxEnrichmentAPI.Api.Services.IAuditLoggingService">
+            <summary>
+            Interface for FCRA-compliant audit logging service.
+            Enables testability through dependency inversion (SOLID principle).
+            </summary>
+        </member>
+        <member name="M:EquifaxEnrichmentAPI.Api.Services.IAuditLoggingService.LogRequestAsync(EquifaxEnrichmentAPI.Api.Services.AuditLogEntry,System.Threading.CancellationToken)">
+            <summary>
+            Enqueue audit log entry for async processing (fire-and-forget, &lt; 1ms overhead).
+            </summary>
+            <param name="entry">Audit log entry to persist</param>
+            <param name="cancellationToken">Cancellation token for graceful shutdown</param>
+            <returns>ValueTask for fire-and-forget pattern</returns>
+        </member>
+    </members>
+</doc>

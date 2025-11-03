@@ -208,7 +208,7 @@
           "System.IO.FileSystem.Watcher": "9.0.0.0",
           "System.IO.IsolatedStorage": "9.0.0.0",
           "System.IO.MemoryMappedFiles": "9.0.0.0",
-          "System.IO.Pipelines": "9.0.0.0",
+          "System.IO.Pipelines.Reference": "9.0.0.0",
           "System.IO.Pipes.AccessControl": "9.0.0.0",
           "System.IO.Pipes": "9.0.0.0",
           "System.IO.UnmanagedMemoryStream": "9.0.0.0",
@@ -1377,6 +1377,35 @@
           "lib/net8.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll": {}
         }
       },
+      "Pipelines.Sockets.Unofficial/2.2.8": {
+        "dependencies": {
+          "System.IO.Pipelines": "5.0.1"
+        },
+        "runtime": {
+          "lib/net5.0/Pipelines.Sockets.Unofficial.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "2.2.8.1080"
+          }
+        },
+        "compile": {
+          "lib/net5.0/Pipelines.Sockets.Unofficial.dll": {}
+        }
+      },
+      "StackExchange.Redis/2.9.32": {
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.10",
+          "Pipelines.Sockets.Unofficial": "2.2.8"
+        },
+        "runtime": {
+          "lib/net8.0/StackExchange.Redis.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.9.32.54708"
+          }
+        },
+        "compile": {
+          "lib/net8.0/StackExchange.Redis.dll": {}
+        }
+      },
       "Swashbuckle.AspNetCore/9.0.6": {
         "dependencies": {
           "Microsoft.Extensions.ApiDescription.Server": "9.0.0",
@@ -1449,6 +1478,7 @@
           "lib/net9.0/System.Diagnostics.EventLog.dll": {}
         }
       },
+      "System.IO.Pipelines/5.0.1": {},
       "System.Reflection.Metadata/1.6.0": {},
       "xunit/2.9.2": {
         "dependencies": {
@@ -1523,6 +1553,7 @@
           "FluentValidation.AspNetCore": "11.3.1",
           "MediatR": "13.1.0",
           "Microsoft.AspNetCore.OpenApi": "9.0.9",
+          "StackExchange.Redis": "2.9.32",
           "Swashbuckle.AspNetCore": "9.0.6"
         },
         "runtime": {
@@ -2556,7 +2587,7 @@
         },
         "compileOnly": true
       },
-      "System.IO.Pipelines/9.0.0.0": {
+      "System.IO.Pipelines.Reference/9.0.0.0": {
         "compile": {
           "System.IO.Pipelines.dll": {}
         },
@@ -3624,6 +3655,20 @@
       "path": "npgsql.entityframeworkcore.postgresql/9.0.4",
       "hashPath": "npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512"
     },
+    "Pipelines.Sockets.Unofficial/2.2.8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zG2FApP5zxSx6OcdJQLbZDk2AVlN2BNQD6MorwIfV6gVj0RRxWPEp2LXAxqDGZqeNV1Zp0BNPcNaey/GXmTdvQ==",
+      "path": "pipelines.sockets.unofficial/2.2.8",
+      "hashPath": "pipelines.sockets.unofficial.2.2.8.nupkg.sha512"
+    },
+    "StackExchange.Redis/2.9.32": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-j5Rjbf7gWz5izrn0UWQy9RlQY4cQDPkwJfVqATnVsOa/+zzJrps12LOgacMsDl/Vit2f01cDiDkG/Rst8v2iGw==",
+      "path": "stackexchange.redis/2.9.32",
+      "hashPath": "stackexchange.redis.2.9.32.nupkg.sha512"
+    },
     "Swashbuckle.AspNetCore/9.0.6": {
       "type": "package",
       "serviceable": true,
@@ -3658,6 +3703,13 @@
       "sha512": "sha512-Jc+az1pTMujPLDn2j5eqSfzlO7j/T1K/LB7THxdfRWOxujE4zaitUqBs7sv1t6/xmmvpU6Xx3IofCs4owYH0yQ==",
       "path": "system.diagnostics.eventlog/9.0.10",
       "hashPath": "system.diagnostics.eventlog.9.0.10.nupkg.sha512"
+    },
+    "System.IO.Pipelines/5.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qEePWsaq9LoEEIqhbGe6D5J8c9IqQOUuTzzV6wn1POlfdLkJliZY3OlB0j0f17uMWlqZYjH7txj+2YbyrIA8Yg==",
+      "path": "system.io.pipelines/5.0.1",
+      "hashPath": "system.io.pipelines.5.0.1.nupkg.sha512"
     },
     "System.Reflection.Metadata/1.6.0": {
       "type": "package",
@@ -4557,7 +4609,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "System.IO.Pipelines/9.0.0.0": {
+    "System.IO.Pipelines.Reference/9.0.0.0": {
       "type": "referenceassembly",
       "serviceable": false,
       "sha512": ""

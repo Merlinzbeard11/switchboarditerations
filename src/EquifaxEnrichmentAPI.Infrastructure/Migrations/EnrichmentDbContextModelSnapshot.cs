@@ -22,6 +22,74 @@ namespace EquifaxEnrichmentAPI.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("EquifaxEnrichmentAPI.Domain.Entities.AuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid>("BuyerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("buyer_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(45)
+                        .HasColumnType("character varying(45)")
+                        .HasColumnName("ip_address");
+
+                    b.Property<string>("PermissiblePurpose")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("permissible_purpose");
+
+                    b.Property<string>("PhoneHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("phone_hash");
+
+                    b.Property<string>("Response")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("response");
+
+                    b.Property<int>("StatusCode")
+                        .HasColumnType("integer")
+                        .HasColumnName("status_code");
+
+                    b.Property<DateTime>("Timestamp")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("timestamp")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Timestamp")
+                        .IsDescending()
+                        .HasDatabaseName("ix_audit_logs_timestamp");
+
+                    b.HasIndex("BuyerId", "Timestamp")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("ix_audit_logs_buyer_id_timestamp");
+
+                    b.HasIndex("PhoneHash", "Timestamp")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("ix_audit_logs_phone_hash_timestamp");
+
+                    b.ToTable("audit_logs", (string)null);
+                });
+
             modelBuilder.Entity("EquifaxEnrichmentAPI.Domain.Entities.Buyer", b =>
                 {
                     b.Property<Guid>("Id")

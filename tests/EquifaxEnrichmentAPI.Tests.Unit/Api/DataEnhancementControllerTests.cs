@@ -5,6 +5,7 @@ using Moq;
 using MediatR;
 using EquifaxEnrichmentAPI.Api.Controllers;
 using EquifaxEnrichmentAPI.Api.DTOs;
+using EquifaxEnrichmentAPI.Api.Services;
 using EquifaxEnrichmentAPI.Application.Queries.Lookup;
 
 namespace EquifaxEnrichmentAPI.Tests.Unit.Api;
@@ -20,11 +21,13 @@ namespace EquifaxEnrichmentAPI.Tests.Unit.Api;
 public class DataEnhancementControllerTests
 {
     private readonly Mock<IMediator> _mediatorMock;
+    private readonly Mock<IAuditLoggingService> _auditServiceMock;
     private readonly DataEnhancementController _controller;
 
     public DataEnhancementControllerTests()
     {
         _mediatorMock = new Mock<IMediator>();
+        _auditServiceMock = new Mock<IAuditLoggingService>();
 
         // Setup smart mock that dynamically responds based on query
         // Simulates handler behavior to test controller mapping
@@ -108,7 +111,14 @@ public class DataEnhancementControllerTests
                 };
             });
 
-        _controller = new DataEnhancementController(_mediatorMock.Object);
+        _controller = new DataEnhancementController(_mediatorMock.Object, _auditServiceMock.Object);
+
+        // Setup HttpContext for BuyerId access (set by ApiKeyAuthenticationMiddleware)
+        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext()
+        };
+        _controller.HttpContext.Items["BuyerId"] = Guid.NewGuid();
     }
 
     // ============================================================================
@@ -376,5 +386,257 @@ public class DataEnhancementControllerTests
 
         // Each request should have a unique request_id
         response1.Metadata.RequestId.Should().NotBe(response2.Metadata.RequestId);
+    }
+
+    // ============================================================================
+    // FEATURE 2.3: FCRA AUDIT LOGGING - CONTROLLER INTEGRATION TESTS
+    // BDD Feature: features/phase2/feature-2.3-fcra-audit-logging.feature
+    // ============================================================================
+
+    /// <summary>
+    /// TDD Test for Feature 2.3: Verify AuditLoggingService is called after successful lookup
+    /// BDD Scenario 1 (Lines 19-38): Log every API query with comprehensive audit trail
+    /// </summary>
+    [Fact]
+    public async Task Lookup_SuccessfulRequest_CallsAuditLoggingService()
+    {
+        // Arrange
+        var auditServiceMock = new Mock<IAuditLoggingService>();
+        var controller = new DataEnhancementController(_mediatorMock.Object, auditServiceMock.Object);
+
+        // Setup HttpContext for BuyerId access
+        controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext()
+        };
+        controller.HttpContext.Items["BuyerId"] = Guid.NewGuid();
+
+        var request = new LookupRequestDto
+        {
+            ProviderCode = "EQUIFAX_ENRICHMENT",
+            Phone = "8015551234",
+            PermissiblePurpose = "insurance_underwriting",
+            IpAddress = "192.168.1.100"
+        };
+
+        // Act
+        var result = await controller.Lookup(request);
+
+        // Assert
+        // BDD Scenario 1: Audit log entry should be created (Line 24)
+        auditServiceMock.Verify(
+            x => x.LogRequestAsync(It.IsAny<AuditLogEntry>(), It.IsAny<CancellationToken>()),
+            Times.Once,
+            "Audit logging service must be called exactly once per API request (FCRA § 607(b) requirement)"
+        );
+    }
+
+    /// <summary>
+    /// TDD Test for Feature 2.3: Verify correct phone hash is logged
+    /// BDD Scenario 1 (Line 27): phone_number_queried_hash should be SHA-256 hash
+    /// </summary>
+    [Fact]
+    public async Task Lookup_SuccessfulRequest_LogsCorrectPhoneHash()
+    {
+        // Arrange
+        var auditServiceMock = new Mock<IAuditLoggingService>();
+        var controller = new DataEnhancementController(_mediatorMock.Object, auditServiceMock.Object);
+
+        // Setup HttpContext for BuyerId access
+        controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext()
+        };
+        controller.HttpContext.Items["BuyerId"] = Guid.NewGuid();
+
+        var phone = "8015551234";
+        var request = new LookupRequestDto
+        {
+            ProviderCode = "EQUIFAX_ENRICHMENT",
+            Phone = phone,
+            PermissiblePurpose = "insurance_underwriting"
+        };
+
+        // Act
+        await controller.Lookup(request);
+
+        // Assert
+        // BDD Scenario 1: Phone should be passed to audit service for hashing (Line 38)
+        // NOTE: PhoneHash is computed by AuditLoggingService, not the controller
+        auditServiceMock.Verify(
+            x => x.LogRequestAsync(
+                It.Is<AuditLogEntry>(entry => entry.Phone == phone),
+                It.IsAny<CancellationToken>()
+            ),
+            Times.Once,
+            "Phone number must be passed to audit logging service for FCRA compliance"
+        );
+    }
+
+    /// <summary>
+    /// TDD Test for Feature 2.3: Verify permissible purpose is logged
+    /// BDD Scenario 1 (Line 30): permissible_purpose should be logged
+    /// </summary>
+    [Fact]
+    public async Task Lookup_SuccessfulRequest_LogsPermissiblePurpose()
+    {
+        // Arrange
+        var auditServiceMock = new Mock<IAuditLoggingService>();
+        var controller = new DataEnhancementController(_mediatorMock.Object, auditServiceMock.Object);
+
+        // Setup HttpContext for BuyerId access
+        controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext()
+        };
+        controller.HttpContext.Items["BuyerId"] = Guid.NewGuid();
+
+        var permissiblePurpose = "insurance_underwriting";
+        var request = new LookupRequestDto
+        {
+            ProviderCode = "EQUIFAX_ENRICHMENT",
+            Phone = "8015551234",
+            PermissiblePurpose = permissiblePurpose
+        };
+
+        // Act
+        await controller.Lookup(request);
+
+        // Assert
+        // BDD Scenario 1: Permissible purpose must be logged (Line 30)
+        auditServiceMock.Verify(
+            x => x.LogRequestAsync(
+                It.Is<AuditLogEntry>(entry => entry.PermissiblePurpose == permissiblePurpose),
+                It.IsAny<CancellationToken>()
+            ),
+            Times.Once,
+            "Permissible purpose must be logged for every query (FCRA § 604 requirement)"
+        );
+    }
+
+    /// <summary>
+    /// TDD Test for Feature 2.3: Verify IP address is logged
+    /// BDD Scenario 1 (Line 31): ip_address should be logged
+    /// </summary>
+    [Fact]
+    public async Task Lookup_SuccessfulRequest_LogsIpAddress()
+    {
+        // Arrange
+        var auditServiceMock = new Mock<IAuditLoggingService>();
+        var controller = new DataEnhancementController(_mediatorMock.Object, auditServiceMock.Object);
+
+        // Setup HttpContext for BuyerId access
+        controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext()
+        };
+        controller.HttpContext.Items["BuyerId"] = Guid.NewGuid();
+
+        var ipAddress = "192.168.1.100";
+        var request = new LookupRequestDto
+        {
+            ProviderCode = "EQUIFAX_ENRICHMENT",
+            Phone = "8015551234",
+            PermissiblePurpose = "insurance_underwriting",
+            IpAddress = ipAddress
+        };
+
+        // Act
+        await controller.Lookup(request);
+
+        // Assert
+        // BDD Scenario 1: IP address should be logged (Line 31)
+        auditServiceMock.Verify(
+            x => x.LogRequestAsync(
+                It.Is<AuditLogEntry>(entry => entry.IpAddress == ipAddress),
+                It.IsAny<CancellationToken>()
+            ),
+            Times.Once,
+            "IP address must be logged for fraud detection and audit trail"
+        );
+    }
+
+    /// <summary>
+    /// TDD Test for Feature 2.3: Verify response type is logged
+    /// BDD Scenario 1 (Line 29): match_found should be logged
+    /// </summary>
+    [Fact]
+    public async Task Lookup_SuccessfulMatch_LogsSuccessResponse()
+    {
+        // Arrange
+        var auditServiceMock = new Mock<IAuditLoggingService>();
+        var controller = new DataEnhancementController(_mediatorMock.Object, auditServiceMock.Object);
+
+        // Setup HttpContext for BuyerId access
+        controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext()
+        };
+        controller.HttpContext.Items["BuyerId"] = Guid.NewGuid();
+
+        var request = new LookupRequestDto
+        {
+            ProviderCode = "EQUIFAX_ENRICHMENT",
+            Phone = "8015551234", // Will return success from mock
+            PermissiblePurpose = "insurance_underwriting"
+        };
+
+        // Act
+        await controller.Lookup(request);
+
+        // Assert
+        // BDD Scenario 1: Response should be "success" for matches (Line 29)
+        auditServiceMock.Verify(
+            x => x.LogRequestAsync(
+                It.Is<AuditLogEntry>(entry =>
+                    entry.Response == "success" &&
+                    entry.StatusCode == 200),
+                It.IsAny<CancellationToken>()
+            ),
+            Times.Once,
+            "Successful lookups must be logged with response='success' and status_code=200"
+        );
+    }
+
+    /// <summary>
+    /// TDD Test for Feature 2.3: Verify no-match responses are logged
+    /// BDD Scenario 4: No Match Found - should still log audit entry
+    /// </summary>
+    [Fact]
+    public async Task Lookup_NoMatchFound_StillLogsAuditEntry()
+    {
+        // Arrange
+        var auditServiceMock = new Mock<IAuditLoggingService>();
+        var controller = new DataEnhancementController(_mediatorMock.Object, auditServiceMock.Object);
+
+        // Setup HttpContext for BuyerId access
+        controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext()
+        };
+        controller.HttpContext.Items["BuyerId"] = Guid.NewGuid();
+
+        var request = new LookupRequestDto
+        {
+            ProviderCode = "EQUIFAX_ENRICHMENT",
+            Phone = "5559999999", // Mock returns no match for this phone
+            PermissiblePurpose = "insurance_underwriting"
+        };
+
+        // Act
+        await controller.Lookup(request);
+
+        // Assert
+        // BDD Scenario: No-match queries MUST still be audited (FCRA requirement)
+        auditServiceMock.Verify(
+            x => x.LogRequestAsync(
+                It.Is<AuditLogEntry>(entry =>
+                    entry.Response == "error" &&
+                    entry.Phone == "5559999999"),
+                It.IsAny<CancellationToken>()
+            ),
+            Times.Once,
+            "No-match queries must STILL be logged for FCRA compliance (every query attempt must be audited)"
+        );
     }
 }

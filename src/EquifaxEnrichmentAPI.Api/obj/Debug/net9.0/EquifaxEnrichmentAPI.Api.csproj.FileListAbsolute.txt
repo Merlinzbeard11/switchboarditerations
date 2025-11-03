@@ -148,3 +148,7 @@
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/bin/Debug/net9.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/bin/Debug/net9.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 /Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/bin/Debug/net9.0/appsettings.Production.json
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/bin/Debug/net9.0/EquifaxEnrichmentAPI.Api.xml
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/obj/Debug/net9.0/EquifaxEnrichmentAPI.Api.xml
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/bin/Debug/net9.0/Pipelines.Sockets.Unofficial.dll
+/Users/merlinzbeard/projects/Viable product/src/EquifaxEnrichmentAPI.Api/bin/Debug/net9.0/StackExchange.Redis.dll

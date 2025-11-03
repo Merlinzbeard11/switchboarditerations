@@ -190,6 +190,67 @@ Minimum Viable Product includes only features **absolutely required** to:
 
 ---
 
+### Feature 2.4: Audit Log Database Persistence ❌ NOT IMPLEMENTED
+**Status:** CRITICAL GAP - Infrastructure exists but not saving data
+**BDD Feature:** `features/phase2/feature-2.4-audit-log-persistence.feature`
+
+**Problem Identified:**
+Feature 2.3 (FCRA Audit Logging) infrastructure exists but database persistence is NOT implemented.
+- AuditLoggingService collects data but discards it (lines 107-108 commented out)
+- No AuditLog entity in Domain layer
+- No database table created
+- NO FCRA COMPLIANCE - Cannot respond to consumer access requests or regulatory audits
+
+**Capabilities Required:**
+- Create `AuditLog` entity with proper EF Core configuration
+- Add `DbSet<AuditLog>` to EnrichmentDbContext
+- Uncomment database persistence in `AuditLoggingService.cs`
+- Create migration: `AddAuditLogTable`
+- Index on `BuyerId`, `PhoneHash`, `Timestamp` for fast queries
+- Partition table by month for performance (326M+ record dataset expected)
+
+**Database Schema:**
+```sql
+CREATE TABLE audit_logs (
+    id UUID PRIMARY KEY,
+    timestamp TIMESTAMPTZ NOT NULL,
+    buyer_id VARCHAR(50) NOT NULL,
+    phone_hash VARCHAR(64) NOT NULL,  -- SHA-256 hash (privacy)
+    permissible_purpose VARCHAR(100) NOT NULL,
+    ip_address VARCHAR(45),
+    response VARCHAR(20),
+    status_code INT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_audit_logs_buyer ON audit_logs(buyer_id, timestamp DESC);
+CREATE INDEX idx_audit_logs_phone ON audit_logs(phone_hash, timestamp DESC);
+CREATE INDEX idx_audit_logs_timestamp ON audit_logs(timestamp DESC);
+```
+
+**FCRA Requirements:**
+- ✅ Phone number hashing (already implemented in service)
+- ❌ 24-month retention (NOT persisting data)
+- ❌ Immutable audit trail (NO database table)
+- ❌ Consumer access request support (NO data to query)
+- ❌ Quarterly compliance reports (NO data to report)
+
+**Tasks:**
+1. Create Domain/Entities/AuditLog.cs entity
+2. Create Infrastructure/Persistence/Configurations/AuditLogConfiguration.cs
+3. Add DbSet<AuditLog> to EnrichmentDbContext
+4. Create migration: `dotnet ef migrations add AddAuditLogTable`
+5. Update AuditLoggingService.ProcessBatchAsync to persist to database
+6. Test batch processing with 100+ entries
+7. Verify 24-month retention with automated cleanup job
+8. Deploy to production with migration
+
+**Estimate:** 4-6 hours
+**Priority:** CRITICAL - FCRA compliance requirement
+**Blocking:** Legal compliance, cannot launch without audit trail
+
+---
+
 ## PHASE 4: DEPLOYMENT ✅ COMPLETED
 
 ### Feature 4.3: AWS Deployment ✅ DEPLOYED

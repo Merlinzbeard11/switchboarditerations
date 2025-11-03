@@ -3,9 +3,11 @@ using System.Text.Json.Serialization;
 namespace EquifaxEnrichmentAPI.Api.DTOs;
 
 /// <summary>
-/// Request DTO for phone number enrichment lookup.
-/// Maps to BDD Scenario 1-3: Basic fields, full fields, and optional fields for improved matching.
-/// BDD File: features/phase1/feature-1.1-rest-api-endpoint.feature
+/// Request payload for phone number enrichment lookup.
+///
+/// This is what you send when requesting enrichment data for a phone number.
+/// Think of it as an order form: provide the phone number (required) and any optional
+/// details (name, address) to improve match accuracy.
 /// </summary>
 public class LookupRequestDto
 {
@@ -18,9 +20,7 @@ public class LookupRequestDto
 
     /// <summary>
     /// Phone number to enrich (required)
-    /// Supports multiple formats - will be normalized using PhoneNumber value object
-    /// BDD Scenario 7: Phone number format validation
-    /// BDD Scenario 10: Phone number normalization
+    /// Supports multiple formats - will be normalized automatically
     /// </summary>
     [JsonPropertyName("phone")]
     public string? Phone { get; set; }
@@ -29,7 +29,6 @@ public class LookupRequestDto
     /// FCRA-compliant permissible purpose for data access (required)
     /// Valid values: insurance_underwriting, credit_extension, employment_screening,
     /// tenant_screening, legitimate_business_need
-    /// BDD Scenario 8: Permissible purpose validation
     /// </summary>
     [JsonPropertyName("permissible_purpose")]
     public string? PermissiblePurpose { get; set; }
@@ -37,15 +36,12 @@ public class LookupRequestDto
     /// <summary>
     /// Fields to return: "basic" (~50 fields) or "full" (398 fields)
     /// Defaults to "basic" if not specified
-    /// BDD Scenario 2: Full dataset request
-    /// BDD Scenario 11: Default fields selection
     /// </summary>
     [JsonPropertyName("fields")]
     public string Fields { get; set; } = "basic";
 
     // ========================================================================
     // OPTIONAL FIELDS for improved match confidence
-    // BDD Scenario 3: Optional fields increase match_confidence above 0.90
     // ========================================================================
 
     /// <summary>
@@ -81,7 +77,6 @@ public class LookupRequestDto
     /// <summary>
     /// Client-provided unique identifier for request tracking (optional)
     /// Returned in response metadata for correlation
-    /// BDD Scenario 12: Metadata completeness
     /// </summary>
     [JsonPropertyName("unique_id")]
     public string? UniqueId { get; set; }

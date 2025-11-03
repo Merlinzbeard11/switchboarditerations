@@ -1,28 +1,31 @@
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using EquifaxEnrichmentAPI.Api.DTOs;
+using EquifaxEnrichmentAPI.Api.Services;
 using EquifaxEnrichmentAPI.Application.Queries.Lookup;
 
 namespace EquifaxEnrichmentAPI.Api.Controllers;
 
 /// <summary>
 /// Data Enhancement API Controller for phone number enrichment.
-/// BDD Feature: REST API Endpoint for Phone Number Enrichment
-/// BDD File: features/phase1/feature-1.1-rest-api-endpoint.feature
 ///
-/// NOTE: This is Slice 3 implementation with CQRS/MediatR pattern.
-/// Controller is thin - all business logic in LookupQueryHandler.
-/// Future slices will add: authentication, database lookup, FCRA audit logging, rate limiting.
+/// FCRA COMPLIANCE:
+/// Every API request is logged for compliance requirements.
+///
+/// ARCHITECTURE:
+/// Uses CQRS/MediatR pattern - controller delegates to LookupQueryHandler.
 /// </summary>
 [ApiController]
 [Route("api/data_enhancement")]
 public class DataEnhancementController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IAuditLoggingService _auditLoggingService;
 
-    public DataEnhancementController(IMediator mediator)
+    public DataEnhancementController(IMediator mediator, IAuditLoggingService auditLoggingService)
     {
-        _mediator = mediator;
+        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+        _auditLoggingService = auditLoggingService ?? throw new ArgumentNullException(nameof(auditLoggingService));
     }
     /// <summary>
     /// Enrich phone number with comprehensive consumer data
@@ -144,9 +147,11 @@ public class DataEnhancementController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Lookup([FromBody] LookupRequestDto request)
     {
-        // TODO (Future Slice): Validate API key (BDD Scenario 5)
-        // TODO (Future Slice): Check rate limiting (BDD Scenario 9)
-        // TODO (Future Slice): Log FCRA audit entry (BDD Scenarios 1, 4)
+        // ====================================================================
+        // EXTRACT BUYER ID FROM AUTHENTICATION CONTEXT
+        // Set by ApiKeyAuthenticationMiddleware (Feature 2.1)
+        // ====================================================================
+        var buyerId = HttpContext.Items["BuyerId"] as Guid? ?? Guid.Empty;
 
         // ====================================================================
         // MAP API DTO TO APPLICATION QUERY
@@ -196,6 +201,28 @@ public class DataEnhancementController : ControllerBase
                 TotalFieldsReturned = result.Metadata.TotalFieldsReturned
             }
         };
+
+        // ====================================================================
+        // FEATURE 2.3: FCRA AUDIT LOGGING
+        // BDD File: features/phase2/feature-2.3-fcra-audit-logging.feature
+        // BDD Scenario 1: Log every API query with comprehensive audit trail
+        // BDD Scenario 2: Fire-and-forget async logging (< 1ms overhead)
+        // ====================================================================
+        // CRITICAL: Fire-and-forget pattern - DO NOT await
+        // Audit logging must NOT block API response (BDD Scenario 2: < 1ms overhead)
+        _ = _auditLoggingService.LogRequestAsync(
+            new AuditLogEntry
+            {
+                BuyerId = buyerId.ToString(),
+                Phone = request.Phone,
+                PermissiblePurpose = request.PermissiblePurpose ?? "not_specified",
+                IpAddress = request.IpAddress ?? HttpContext.Connection.RemoteIpAddress?.ToString(),
+                Response = result.Response, // "success" or "error"
+                StatusCode = 200, // Always 200 for this endpoint
+                Timestamp = DateTime.UtcNow
+            },
+            HttpContext.RequestAborted
+        );
 
         return Ok(response);
     }

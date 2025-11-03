@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "VrKe6Tnv4bk=",
+  "dgSpecHash": "zeLMFJ4UJwM=",
   "success": true,
   "projectFilePath": "/Users/merlinzbeard/projects/Viable product/tests/EquifaxEnrichmentAPI.Tests.Unit/EquifaxEnrichmentAPI.Tests.Unit.csproj",
   "expectedPackageFiles": [
@@ -41,11 +41,14 @@
     "/Users/merlinzbeard/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/npgsql/9.0.3/npgsql.9.0.3.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.4/npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512",
+    "/Users/merlinzbeard/.nuget/packages/pipelines.sockets.unofficial/2.2.8/pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
+    "/Users/merlinzbeard/.nuget/packages/stackexchange.redis/2.9.32/stackexchange.redis.2.9.32.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/swashbuckle.aspnetcore/9.0.6/swashbuckle.aspnetcore.9.0.6.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/swashbuckle.aspnetcore.swagger/9.0.6/swashbuckle.aspnetcore.swagger.9.0.6.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/swashbuckle.aspnetcore.swaggergen/9.0.6/swashbuckle.aspnetcore.swaggergen.9.0.6.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/swashbuckle.aspnetcore.swaggerui/9.0.6/swashbuckle.aspnetcore.swaggerui.9.0.6.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/system.diagnostics.eventlog/6.0.0/system.diagnostics.eventlog.6.0.0.nupkg.sha512",
+    "/Users/merlinzbeard/.nuget/packages/system.io.pipelines/5.0.1/system.io.pipelines.5.0.1.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/system.reflection.metadata/1.6.0/system.reflection.metadata.1.6.0.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/xunit/2.9.2/xunit.2.9.2.nupkg.sha512",
     "/Users/merlinzbeard/.nuget/packages/xunit.abstractions/2.0.3/xunit.abstractions.2.0.3.nupkg.sha512",
