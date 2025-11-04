@@ -3,6 +3,9 @@ using EquifaxEnrichmentAPI.Infrastructure.Persistence;
 using EquifaxEnrichmentAPI.Domain.Repositories;
 using EquifaxEnrichmentAPI.Infrastructure.Repositories;
 using EquifaxEnrichmentAPI.Api.Middleware;
+using EquifaxEnrichmentAPI.Application.Configuration;
+using EquifaxEnrichmentAPI.Application.Interfaces;
+using EquifaxEnrichmentAPI.Infrastructure.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -72,10 +75,20 @@ builder.Services.AddHostedService(sp =>
     sp.GetRequiredService<EquifaxEnrichmentAPI.Api.Services.AuditLoggingService>());
 
 // ====================================================================
+// ENCRYPTION CONFIGURATION (IOptions Pattern)
+// Loads encryption key from appsettings.json or Azure Key Vault
+// BDD Feature: AES-GCM Decryption Service
+// BDD File: features/phase1/feature-1.4-aes-gcm-decryption.feature
+// ====================================================================
+builder.Services.Configure<EncryptionOptions>(
+    builder.Configuration.GetSection(EncryptionOptions.SectionName));
+
+// ====================================================================
 // DEPENDENCY INJECTION
-// Repository Pattern following Clean Architecture
+// Repository Pattern and Services following Clean Architecture
 // ====================================================================
 builder.Services.AddScoped<IEnrichmentRepository, EnrichmentRepository>();
+builder.Services.AddScoped<IAesGcmDecryptionService, AesGcmDecryptionService>();
 
 // ====================================================================
 // MEDIATR (CQRS)
