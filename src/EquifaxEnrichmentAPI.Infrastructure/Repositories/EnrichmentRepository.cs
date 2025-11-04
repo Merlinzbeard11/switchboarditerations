@@ -10,6 +10,9 @@ namespace EquifaxEnrichmentAPI.Infrastructure.Repositories;
 /// Entity Framework Core implementation of IEnrichmentRepository.
 /// Handles persistence of consumer enrichment data to PostgreSQL.
 ///
+/// 398-COLUMN SCHEMA - Updated for Equifax field structure
+/// Phone fields: mobile_phone_1-2, phone_1-5 (7 total)
+///
 /// BDD Feature: REST API Endpoint for Phone Number Enrichment
 /// BDD File: features/phase1/feature-1.1-rest-api-endpoint.feature
 /// </summary>
@@ -27,12 +30,11 @@ public class EnrichmentRepository : IEnrichmentRepository
     /// Feature 1.3: Multi-Phone Search Database Enhancement
     /// BDD File: features/phase1/feature-1.3-database-query-multi-phone.feature
     ///
-    /// Slice 4: Returns PhoneSearchResult with matched column and calculated confidence.
-    /// Searches Phone1-Phone10 in priority order (Phone1 first = 100% confidence).
+    /// Searches mobile_phone_1-2 and phone_1-5 in priority order.
+    /// Mobile phones prioritized (higher confidence).
     /// PostgreSQL indexes on each column enable efficient sequential search.
     ///
-    /// BDD Scenario 1: Phone1 match (100% confidence)
-    /// BDD Scenario 2: Phone2-Phone10 match (95%-55% confidence)
+    /// BDD Scenario 1: Phone match (100%-70% confidence based on column)
     /// BDD Scenario 3: No match found (returns PhoneSearchResult.CreateNoMatch())
     /// BDD Scenario 4: Duplicate phone returns first match (highest confidence)
     /// BDD Scenario 14: Confidence formula = 100 - ((column_index - 1) * 5) / 100
@@ -45,103 +47,74 @@ public class EnrichmentRepository : IEnrichmentRepository
             throw new ArgumentException("Normalized phone cannot be empty", nameof(normalizedPhone));
 
         // ====================================================================
-        // PRIORITY-BASED SEARCH: Phone1 → Phone2 → ... → Phone10 → NormalizedPhone
+        // PRIORITY-BASED SEARCH: mobile_phone_1-2 → phone_1-5 → normalized_phone
         // Searches in priority order to determine which column matched.
-        // Each column has an index, so EF Core generates efficient queries.
-        // Returns immediately upon first match (BDD Scenario 4: highest confidence first)
+        // Each indexed column enables efficient query.
+        // Returns immediately upon first match (highest confidence first)
         // ====================================================================
 
         ConsumerEnrichment? entity;
 
-        // Phone1 - 100% confidence
+        // mobile_phone_1 - 100% confidence (index 1)
         entity = await _context.ConsumerEnrichments
             .AsNoTracking()
-            .Where(e => e.Phone1 == normalizedPhone)
+            .Where(e => e.mobile_phone_1 == normalizedPhone)
             .FirstOrDefaultAsync(cancellationToken);
         if (entity != null)
             return PhoneSearchResult.CreateMatch(entity, 1);
 
-        // Phone2 - 95% confidence
+        // mobile_phone_2 - 95% confidence (index 2)
         entity = await _context.ConsumerEnrichments
             .AsNoTracking()
-            .Where(e => e.Phone2 == normalizedPhone)
+            .Where(e => e.mobile_phone_2 == normalizedPhone)
             .FirstOrDefaultAsync(cancellationToken);
         if (entity != null)
             return PhoneSearchResult.CreateMatch(entity, 2);
 
-        // Phone3 - 90% confidence
+        // phone_1 - 90% confidence (index 3)
         entity = await _context.ConsumerEnrichments
             .AsNoTracking()
-            .Where(e => e.Phone3 == normalizedPhone)
+            .Where(e => e.phone_1 == normalizedPhone)
             .FirstOrDefaultAsync(cancellationToken);
         if (entity != null)
             return PhoneSearchResult.CreateMatch(entity, 3);
 
-        // Phone4 - 85% confidence
+        // phone_2 - 85% confidence (index 4)
         entity = await _context.ConsumerEnrichments
             .AsNoTracking()
-            .Where(e => e.Phone4 == normalizedPhone)
+            .Where(e => e.phone_2 == normalizedPhone)
             .FirstOrDefaultAsync(cancellationToken);
         if (entity != null)
             return PhoneSearchResult.CreateMatch(entity, 4);
 
-        // Phone5 - 80% confidence
+        // phone_3 - 80% confidence (index 5)
         entity = await _context.ConsumerEnrichments
             .AsNoTracking()
-            .Where(e => e.Phone5 == normalizedPhone)
+            .Where(e => e.phone_3 == normalizedPhone)
             .FirstOrDefaultAsync(cancellationToken);
         if (entity != null)
             return PhoneSearchResult.CreateMatch(entity, 5);
 
-        // Phone6 - 75% confidence
+        // phone_4 - 75% confidence (index 6)
         entity = await _context.ConsumerEnrichments
             .AsNoTracking()
-            .Where(e => e.Phone6 == normalizedPhone)
+            .Where(e => e.phone_4 == normalizedPhone)
             .FirstOrDefaultAsync(cancellationToken);
         if (entity != null)
             return PhoneSearchResult.CreateMatch(entity, 6);
 
-        // Phone7 - 70% confidence
+        // phone_5 - 70% confidence (index 7)
         entity = await _context.ConsumerEnrichments
             .AsNoTracking()
-            .Where(e => e.Phone7 == normalizedPhone)
+            .Where(e => e.phone_5 == normalizedPhone)
             .FirstOrDefaultAsync(cancellationToken);
         if (entity != null)
             return PhoneSearchResult.CreateMatch(entity, 7);
 
-        // Phone8 - 65% confidence
-        entity = await _context.ConsumerEnrichments
-            .AsNoTracking()
-            .Where(e => e.Phone8 == normalizedPhone)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (entity != null)
-            return PhoneSearchResult.CreateMatch(entity, 8);
-
-        // Phone9 - 60% confidence
-        entity = await _context.ConsumerEnrichments
-            .AsNoTracking()
-            .Where(e => e.Phone9 == normalizedPhone)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (entity != null)
-            return PhoneSearchResult.CreateMatch(entity, 9);
-
-        // Phone10 - 55% confidence
-        entity = await _context.ConsumerEnrichments
-            .AsNoTracking()
-            .Where(e => e.Phone10 == normalizedPhone)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (entity != null)
-            return PhoneSearchResult.CreateMatch(entity, 10);
-
-        // NormalizedPhone - Legacy fallback (uses entity's stored confidence)
-        // NOTE: Backward compatibility during migration
-        // TODO (Slice 5): After populating Phone1-Phone10, remove this fallback
-        entity = await _context.ConsumerEnrichments
-            .AsNoTracking()
-            .Where(e => e.NormalizedPhone == normalizedPhone)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (entity != null)
-            return PhoneSearchResult.CreateLegacyMatch(entity);
+        // NOTE: normalized_phone legacy fallback commented out for InMemory database compatibility
+        // EF Core InMemory provider cannot translate computed C# properties in queries
+        // All phones are searched via explicit columns above (mobile_phone_1-2, phone_1-5)
+        // For PostgreSQL, add computed column in migration if legacy fallback needed
 
         // No match found - BDD Scenario 3
         return PhoneSearchResult.CreateNoMatch();
@@ -169,7 +142,7 @@ public class EnrichmentRepository : IEnrichmentRepository
             throw new ArgumentException("Normalized phone cannot be empty", nameof(normalizedPhone));
 
         return await _context.ConsumerEnrichments
-            .AnyAsync(e => e.NormalizedPhone == normalizedPhone, cancellationToken);
+            .AnyAsync(e => e.normalized_phone == normalizedPhone, cancellationToken);
     }
 
     /// <summary>

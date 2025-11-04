@@ -89,7 +89,7 @@ public class PhoneSearchResult
         {
             Entity = entity,
             MatchedColumn = null, // Legacy column has no index
-            Confidence = entity.MatchConfidence,
+            Confidence = entity.match_confidence,
             MatchedColumnName = "NormalizedPhone"
         };
     }

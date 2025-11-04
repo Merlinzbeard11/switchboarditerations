@@ -33,14 +33,11 @@ public class PhoneSearchResultTests
     [InlineData(10, 0.55)] // Phone10: 100 - ((10-1)*5) = 55% = 0.55
     public void CreateMatch_CalculatesConfidenceUsingFormula_ForEachColumn(int columnIndex, double expectedConfidence)
     {
-        // Arrange - Create test entity
-        var phone = PhoneNumber.Create("8015551234").Value;
-        var entity = ConsumerEnrichment.Create(
-            phone,
-            "EQF_test",
-            0.50, // This will be IGNORED - confidence comes from column index
-            "phone_only",
-            DateTime.UtcNow);
+        // Arrange - Create test entity (398-column schema)
+        var entity = ConsumerEnrichment.CreateFromEquifaxCsv(
+            consumerKey: "EQF_test",
+            matchConfidence: 0.50, // This will be IGNORED - confidence comes from column index
+            matchType: "phone_only");
 
         // Act - Create result with specific column match
         var result = PhoneSearchResult.CreateMatch(entity, columnIndex);
@@ -57,8 +54,10 @@ public class PhoneSearchResultTests
     public void CreateMatch_Phone1Match_Returns100PercentConfidence()
     {
         // Arrange - BDD Scenario 1: Phone1 match = 100% confidence (Line 22)
-        var phone = PhoneNumber.Create("8015551234").Value;
-        var entity = ConsumerEnrichment.Create(phone, "EQF_test", 0.5, "phone_only", DateTime.UtcNow);
+        var entity = ConsumerEnrichment.CreateFromEquifaxCsv(
+            consumerKey: "EQF_test",
+            matchConfidence: 0.5,
+            matchType: "phone_only");
 
         // Act
         var result = PhoneSearchResult.CreateMatch(entity, 1);
@@ -73,8 +72,10 @@ public class PhoneSearchResultTests
     public void CreateMatch_Phone10Match_Returns55PercentConfidence()
     {
         // Arrange - BDD Scenario 2: Phone10 match = 55% confidence (Line 50)
-        var phone = PhoneNumber.Create("8015551234").Value;
-        var entity = ConsumerEnrichment.Create(phone, "EQF_test", 0.5, "phone_only", DateTime.UtcNow);
+        var entity = ConsumerEnrichment.CreateFromEquifaxCsv(
+            consumerKey: "EQF_test",
+            matchConfidence: 0.5,
+            matchType: "phone_only");
 
         // Act
         var result = PhoneSearchResult.CreateMatch(entity, 10);
@@ -102,8 +103,10 @@ public class PhoneSearchResultTests
     public void CreateMatch_WithInvalidColumnIndex_ThrowsArgumentOutOfRangeException(int invalidColumnIndex)
     {
         // Arrange
-        var phone = PhoneNumber.Create("8015551234").Value;
-        var entity = ConsumerEnrichment.Create(phone, "EQF_test", 0.5, "phone_only", DateTime.UtcNow);
+        var entity = ConsumerEnrichment.CreateFromEquifaxCsv(
+            consumerKey: "EQF_test",
+            matchConfidence: 0.5,
+            matchType: "phone_only");
 
         // Act & Assert
         var act = () => PhoneSearchResult.CreateMatch(entity, invalidColumnIndex);
@@ -116,13 +119,10 @@ public class PhoneSearchResultTests
     public void CreateLegacyMatch_UsesEntityStoredConfidence()
     {
         // Arrange - Legacy NormalizedPhone match uses stored confidence
-        var phone = PhoneNumber.Create("8015551234").Value;
-        var entity = ConsumerEnrichment.Create(
-            phone,
-            "EQF_test",
-            0.87, // This confidence WILL be used for legacy matches
-            "phone_only",
-            DateTime.UtcNow);
+        var entity = ConsumerEnrichment.CreateFromEquifaxCsv(
+            consumerKey: "EQF_test",
+            matchConfidence: 0.87, // This confidence WILL be used for legacy matches
+            matchType: "phone_only");
 
         // Act
         var result = PhoneSearchResult.CreateLegacyMatch(entity);
@@ -161,8 +161,10 @@ public class PhoneSearchResultTests
     public void IsMatch_WhenEntityExists_ReturnsTrue()
     {
         // Arrange
-        var phone = PhoneNumber.Create("8015551234").Value;
-        var entity = ConsumerEnrichment.Create(phone, "EQF_test", 0.5, "phone_only", DateTime.UtcNow);
+        var entity = ConsumerEnrichment.CreateFromEquifaxCsv(
+            consumerKey: "EQF_test",
+            matchConfidence: 0.5,
+            matchType: "phone_only");
 
         // Act
         var result = PhoneSearchResult.CreateMatch(entity, 3);
@@ -200,8 +202,10 @@ public class PhoneSearchResultTests
     public void CreateMatch_SetsMatchedColumnNameCorrectly(int columnIndex, string expectedName)
     {
         // Arrange
-        var phone = PhoneNumber.Create("8015551234").Value;
-        var entity = ConsumerEnrichment.Create(phone, "EQF_test", 0.5, "phone_only", DateTime.UtcNow);
+        var entity = ConsumerEnrichment.CreateFromEquifaxCsv(
+            consumerKey: "EQF_test",
+            matchConfidence: 0.5,
+            matchType: "phone_only");
 
         // Act
         var result = PhoneSearchResult.CreateMatch(entity, columnIndex);

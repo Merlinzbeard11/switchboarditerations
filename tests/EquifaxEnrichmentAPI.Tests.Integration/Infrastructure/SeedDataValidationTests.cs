@@ -46,19 +46,19 @@ public class SeedDataValidationTests : IAsyncLifetime
         // Arrange - BDD: Primary test record (8015551234) should have phone in Phone1
         var expectedPhone = "8015551234";
 
-        // Act - Find consumer by NormalizedPhone (guaranteed to work)
-        var consumer = await _context.ConsumerEnrichments
-            .FirstOrDefaultAsync(e => e.NormalizedPhone == expectedPhone);
+        // Act - Find consumer by normalized_phone (client-side evaluation - computed property)
+        var consumers = await _context.ConsumerEnrichments.ToListAsync();
+        var consumer = consumers.FirstOrDefault(e => e.normalized_phone == expectedPhone);
 
-        // Assert - Phone1 should be populated
+        // Assert - mobile_phone_1 should be populated
         consumer.Should().NotBeNull("seed data should contain 8015551234");
 
-        // Use reflection to access private Phone1 property
-        var phone1Property = typeof(Domain.Entities.ConsumerEnrichment).GetProperty("Phone1");
+        // Use reflection to access private mobile_phone_1 property
+        var phone1Property = typeof(Domain.Entities.ConsumerEnrichment).GetProperty("mobile_phone_1");
         var phone1Value = phone1Property!.GetValue(consumer) as string;
 
         phone1Value.Should().Be(expectedPhone,
-            "primary test record should have phone in Phone1 column for 100% confidence");
+            "primary test record should have phone in mobile_phone_1 column for 100% confidence");
     }
 
     [Fact]
@@ -67,38 +67,38 @@ public class SeedDataValidationTests : IAsyncLifetime
         // Arrange - BDD: Second test record (3105552000) should have phone in Phone2
         var expectedPhone = "3105552000";
 
-        // Act
-        var consumer = await _context.ConsumerEnrichments
-            .FirstOrDefaultAsync(e => e.NormalizedPhone == expectedPhone);
+        // Act - Client-side evaluation for computed property
+        var consumers = await _context.ConsumerEnrichments.ToListAsync();
+        var consumer = consumers.FirstOrDefault(e => e.normalized_phone == expectedPhone);
 
-        // Assert - Phone2 should be populated
+        // Assert - mobile_phone_2 should be populated
         consumer.Should().NotBeNull("seed data should contain 3105552000");
 
-        var phone2Property = typeof(Domain.Entities.ConsumerEnrichment).GetProperty("Phone2");
+        var phone2Property = typeof(Domain.Entities.ConsumerEnrichment).GetProperty("mobile_phone_2");
         var phone2Value = phone2Property!.GetValue(consumer) as string;
 
         phone2Value.Should().Be(expectedPhone,
-            "second test record should have phone in Phone2 column for 95% confidence");
+            "second test record should have phone in mobile_phone_2 column for 95% confidence");
     }
 
     [Fact]
-    public async Task SeedData_Consumer3_ShouldHavePhoneInPhone10Column()
+    public async Task SeedData_Consumer3_ShouldHavePhoneInPhone5Column()
     {
-        // Arrange - BDD: Third test record (2125553000) should have phone in Phone10
+        // Arrange - BDD: Third test record (2125553000) should have phone in phone_5
         var expectedPhone = "2125553000";
 
-        // Act
-        var consumer = await _context.ConsumerEnrichments
-            .FirstOrDefaultAsync(e => e.NormalizedPhone == expectedPhone);
+        // Act - Client-side evaluation for computed property
+        var consumers = await _context.ConsumerEnrichments.ToListAsync();
+        var consumer = consumers.FirstOrDefault(e => e.normalized_phone == expectedPhone);
 
-        // Assert - Phone10 should be populated (lowest confidence)
+        // Assert - phone_5 should be populated (70% confidence - index 7)
         consumer.Should().NotBeNull("seed data should contain 2125553000");
 
-        var phone10Property = typeof(Domain.Entities.ConsumerEnrichment).GetProperty("Phone10");
-        var phone10Value = phone10Property!.GetValue(consumer) as string;
+        var phone5Property = typeof(Domain.Entities.ConsumerEnrichment).GetProperty("phone_5");
+        var phone5Value = phone5Property!.GetValue(consumer) as string;
 
-        phone10Value.Should().Be(expectedPhone,
-            "third test record should have phone in Phone10 column for 55% confidence");
+        phone5Value.Should().Be(expectedPhone,
+            "third test record should have phone in phone_5 column for 70% confidence");
     }
 
     [Fact]
@@ -110,14 +110,15 @@ public class SeedDataValidationTests : IAsyncLifetime
         // Assert - Should have 3 seeded consumers
         consumers.Should().HaveCount(3, "DatabaseSeeder seeds 3 test records");
 
-        // Verify each consumer has at least one Phone1-Phone10 column populated
+        // Verify each consumer has at least one phone column populated (mobile_phone_1-2 or phone_1-5)
         foreach (var consumer in consumers)
         {
             var hasPhoneColumn = false;
+            var phoneProperties = new[] { "mobile_phone_1", "mobile_phone_2", "phone_1", "phone_2", "phone_3", "phone_4", "phone_5" };
 
-            for (int i = 1; i <= 10; i++)
+            foreach (var propName in phoneProperties)
             {
-                var property = typeof(Domain.Entities.ConsumerEnrichment).GetProperty($"Phone{i}");
+                var property = typeof(Domain.Entities.ConsumerEnrichment).GetProperty(propName);
                 var value = property!.GetValue(consumer) as string;
 
                 if (!string.IsNullOrEmpty(value))
@@ -128,7 +129,7 @@ public class SeedDataValidationTests : IAsyncLifetime
             }
 
             hasPhoneColumn.Should().BeTrue(
-                $"Consumer {consumer.ConsumerKey} should have at least one Phone1-Phone10 column populated");
+                $"Consumer {consumer.consumer_key} should have at least one phone column populated");
         }
     }
 
@@ -143,10 +144,10 @@ public class SeedDataValidationTests : IAsyncLifetime
 
         foreach (var consumer in consumers)
         {
-            consumer.NormalizedPhone.Should().NotBeNullOrEmpty(
-                $"Consumer {consumer.ConsumerKey} should have NormalizedPhone for backward compatibility");
-            consumer.NormalizedPhone.Should().HaveLength(10,
-                "NormalizedPhone should be 10 digits");
+            consumer.normalized_phone.Should().NotBeNullOrEmpty(
+                $"Consumer {consumer.consumer_key} should have normalized_phone for backward compatibility");
+            consumer.normalized_phone.Should().HaveLength(10,
+                "normalized_phone should be 10 digits");
         }
     }
 
@@ -155,19 +156,21 @@ public class SeedDataValidationTests : IAsyncLifetime
     {
         // Arrange & Act - Verify phones are distributed across different columns
         var consumers = await _context.ConsumerEnrichments.ToListAsync();
-        var populatedColumns = new HashSet<int>();
+        var populatedColumns = new HashSet<string>();
 
         // Assert - Check which columns are populated across all consumers
+        var phoneColumns = new[] { "mobile_phone_1", "mobile_phone_2", "phone_1", "phone_2", "phone_3", "phone_4", "phone_5" };
+
         foreach (var consumer in consumers)
         {
-            for (int i = 1; i <= 10; i++)
+            foreach (var columnName in phoneColumns)
             {
-                var property = typeof(Domain.Entities.ConsumerEnrichment).GetProperty($"Phone{i}");
+                var property = typeof(Domain.Entities.ConsumerEnrichment).GetProperty(columnName);
                 var value = property!.GetValue(consumer) as string;
 
                 if (!string.IsNullOrEmpty(value))
                 {
-                    populatedColumns.Add(i);
+                    populatedColumns.Add(columnName);
                 }
             }
         }
@@ -175,7 +178,7 @@ public class SeedDataValidationTests : IAsyncLifetime
         populatedColumns.Should().HaveCountGreaterThanOrEqualTo(3,
             "Seed data should use at least 3 different phone columns for test coverage");
 
-        populatedColumns.Should().Contain(1, "Should have at least one Phone1 (100% confidence) test case");
-        populatedColumns.Should().Contain(10, "Should have at least one Phone10 (55% confidence) test case");
+        populatedColumns.Should().Contain("mobile_phone_1", "Should have mobile_phone_1 (100% confidence) test case");
+        populatedColumns.Should().Contain("phone_5", "Should have phone_5 (70% confidence) test case");
     }
 }

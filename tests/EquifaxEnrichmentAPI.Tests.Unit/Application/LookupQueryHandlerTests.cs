@@ -31,21 +31,19 @@ public class LookupQueryHandlerTests
                 if (normalizedPhone == "5559999999")
                     return PhoneSearchResult.CreateNoMatch();
 
-                // Create mock entity with test data from database
-                // Using factory method to create valid entity
-                var phone = PhoneNumber.Create(normalizedPhone).Value;
-
-                var entity = ConsumerEnrichment.Create(
-                    phone,
-                    $"EQF_{Guid.NewGuid():N}",
-                    0.75, // Base confidence for phone-only match (ignored for new phone columns)
-                    "phone_only",
-                    DateTime.UtcNow.AddDays(-7), // Data from 7 days ago
-                    "{\"first_name\":\"Bob\",\"last_name\":\"Barker\"}",
-                    "[{\"street\":\"123 Main St\",\"city\":\"Bountiful\",\"state\":\"UT\",\"postal_code\":\"84010\"}]",
-                    "[{\"phone\":\"8015551234\",\"type\":\"mobile\"}]",
-                    "{\"credit_score\":720}"
+                // Create mock entity with test data (398-column schema)
+                var entity = ConsumerEnrichment.CreateFromEquifaxCsv(
+                    consumerKey: $"EQF_{Guid.NewGuid():N}",
+                    matchConfidence: 0.75, // Base confidence for phone-only match (ignored for new phone columns)
+                    matchType: "phone_only"
                 );
+
+                // Set data freshness using reflection for test metadata
+                var dataFreshnessProperty = typeof(ConsumerEnrichment).GetProperty(
+                    "data_freshness_date",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance
+                );
+                dataFreshnessProperty?.SetValue(entity, DateTimeOffset.UtcNow.AddDays(-7));
 
                 // Feature 1.3 Slice 4: Return PhoneSearchResult with Phone3 match (90% confidence)
                 return PhoneSearchResult.CreateMatch(entity, 3);

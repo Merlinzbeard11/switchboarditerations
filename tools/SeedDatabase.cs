@@ -72,6 +72,17 @@ class Program
             Console.WriteLine();
             Console.WriteLine("Stack Trace:");
             Console.WriteLine(ex.StackTrace);
+
+            // Show inner exception details (critical for reflection errors)
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Inner Exception:");
+                Console.WriteLine($"   Type: {ex.InnerException.GetType().Name}");
+                Console.WriteLine($"   Message: {ex.InnerException.Message}");
+                Console.WriteLine($"   Stack Trace: {ex.InnerException.StackTrace}");
+            }
+
             Console.ResetColor();
             Environment.Exit(1);
         }
